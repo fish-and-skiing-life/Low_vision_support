@@ -22,7 +22,7 @@ services:
       - 8000:8000
     volumes:
       - ./vision-api:/myapp
-    # command: python manage.py runserver 0.0.0.0:8000
+    command: python manage.py runserver 0.0.0.0:8000
     # command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000 --noreload"
     container_name: vision-api
     tty: true
