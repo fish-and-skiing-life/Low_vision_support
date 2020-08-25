@@ -3,5 +3,5 @@ from . import views
 
 
 urlpatterns = [
-    path('api/profile/', views.ProfileListCreate.as_view() ),
+    path('summarize/', views.ArticleSummarization.predict_summarization),
 ]
