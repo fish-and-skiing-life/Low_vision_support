@@ -2,3 +2,8 @@ Django
 djangorestframework
 django-filter
 django-cors-headers
+
+numpy
+scipy
+spacy
+ginza
