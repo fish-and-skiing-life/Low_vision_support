@@ -3,6 +3,9 @@ djangorestframework
 django-filter
 django-cors-headers
 
+requests
+beautifulsoup4
+
 numpy
 scipy
 spacy
