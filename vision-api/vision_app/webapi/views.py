@@ -5,7 +5,7 @@ from django.http import JsonResponse
 
 from webapi.models import Summarization
 from webapi.serializers import SummarizationSerializer
-from webapi.lib import Model
+from webapi.lib.summarizer import LexRank
 
 class ArticleSummarization(viewsets.ViewSet):
     queryset = Summarization.objects.all()
@@ -31,7 +31,8 @@ class ArticleSummarization(viewsets.ViewSet):
         article = ScrapingArticle.scrape_article(media, media_dict[media]+article_id)
 
         # summarization
-        summary_list = Model.predict(article)
+        model = LexRank()
+        summary_list = model.summarize(article)
         res = {f'summary_{i}': s for i, s in enumerate(summary_list)}
 
         return JsonResponse(res, safe=False)
