@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from webapi.models import Profile
+from webapi.models import Summarization
 
-
-class ProfileSerializer(serializers.ModelSerializer):
+class SummarizationSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Profile
-        fields = ('id', 'name', 'email', 'message', 'created_at')
+        model = Summarization
+        fields = ('media', 'article_id', 'summary')
+        read_only_fields = ('summary')
