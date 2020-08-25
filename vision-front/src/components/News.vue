@@ -3,10 +3,10 @@
     <v-row class="text-center">
       <v-col cols="12">
         
-        <h1 class="title mt-10">Wellcome to<br> Low vision service</h1>
+        <h1 class="title mt-10">{{title}}</h1>
 
-        <p class="speak mt-10">読みたいニュースサイトを選んでください。</p>
-        <p class="speak ">ニュースサイトは、ヤフーニュース、朝日新聞、読売新聞、日経新聞、ライブドアを利用できます。</p>
+        <p class="speak mt-10">要約文</p>
+        <p>{{ abst }}</p>
         <v-btn x-large color="primary" @click="startSpeech">{{ recognitionText }}</v-btn><br>
         <button @click="startTalk" class='read'>音声読み上げ</button>
         <p>{{ text }}</p>
@@ -18,14 +18,14 @@
 
 <script>
   export default {
-    name: 'HelloWorld',
-
     data(){
       return {
         recognition : "",
         recognitionText: "音声入力開始",
         text: "",
-        show: false,
+        abst: '明日は京都に行きたいと思ってます',
+        site: localStorage.getItem("site"),
+        show: false
       }
     },
     async mounted(){
@@ -57,7 +57,7 @@
         let welcome = new SpeechSynthesisUtterance();
         welcome.lang = 'ja-JP';
         welcome.rate = 1.3
-        welcome.text = 'ようこそ! low vision webアプリケーションへ。';
+        welcome.text = '読みたいカテゴリーを選んでください。';
         speechSynthesis.speak(welcome);
         this.sleep(1)
         let news = new SpeechSynthesisUtterance();
@@ -70,29 +70,18 @@
         let u = new SpeechSynthesisUtterance();
         u.lang = 'ja-JP';
         u.rate = 1.3
-        u.text = 'ニュースサイトは、ヤフーニュース、朝日新聞、読売新聞、日経新聞、ライブドアを利用できます。';
+        u.text = 'ニュースサイトは、Yahooニュース、朝日新聞、読売新聞、日経新聞、ライブドアを利用できます。';
         speechSynthesis.speak(u);
 
       },
     },
     watch:{
       text(val){
-        if (val.match(/Yahoo/)) {
-          localStorage.site = 'Yahoo'
-          
-        }else if(val.match(/毎日新聞/)){
-          localStorage.site = '毎日新聞'
+        if (this.text.match(/Yahoo/)) {
+          localStorage.site = 'Yahooニュース'
+          this.$router.push('./category')
         }
-        else if(val.match(/読売新聞/)){
-          localStorage.site = '読売新聞'  
-        }
-        else if(val.match(/日経新聞/)){
-          localStorage.site = '日経新聞'
-        }
-        else if(val.match(/ライブドア/)){
-          localStorage.site = 'ライブドア'  
-        }
-        this.$router.push('./category')
+        console.log(val)
       }
     }
   }

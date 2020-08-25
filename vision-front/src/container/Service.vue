@@ -1,5 +1,6 @@
 <!-- App Main Structure -->
 <template>
+  <v-app>
     <div class="app-default-layout">
       <template>
          
@@ -8,6 +9,7 @@
         <!-- <app-footer></app-footer> -->
       </template>
     </div>
+  </v-app>
 </template>
 
 <script>
