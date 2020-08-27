@@ -4,5 +4,4 @@ from webapi.models import Summarization
 class SummarizationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Summarization
-        fields = ('media', 'article_id', 'summary')
-        read_only_fields = ('summary')
+        fields = ('media', 'article_id')
