@@ -80,8 +80,8 @@
         if (val.match(/Yahoo/)) {
           localStorage.site = 'Yahoo'
           
-        }else if(val.match(/毎日新聞/)){
-          localStorage.site = '毎日新聞'
+        }else if(val.match(/朝日新聞/)){
+          localStorage.site = '朝日新聞'
         }
         else if(val.match(/読売新聞/)){
           localStorage.site = '読売新聞'  
