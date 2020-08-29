@@ -8,3 +8,10 @@ class Summarization(models.Model):
     """
     media = models.CharField(max_length=128, null=False, default='unknown')
     article_id = models.TextField()
+
+class ArticleCategory(models.Model):
+    """
+    パラメータ
+        media: 記事媒体 (Yahoo!, livedoor)
+    """
+    media = models.CharField(max_length=128, null=False, default='unknown')
