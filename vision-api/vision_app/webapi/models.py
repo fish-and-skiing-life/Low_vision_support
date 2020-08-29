@@ -14,4 +14,4 @@ class ArticleCategory(models.Model):
     パラメータ
         media: 記事媒体 (Yahoo!, livedoor)
     """
-    media = models.IntegerField()
+    media = models.CharField(max_length=128, null=False, default='unknown')
