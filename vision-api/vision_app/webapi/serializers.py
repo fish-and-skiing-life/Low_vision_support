@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from webapi.models import Summarization, ArticleCategory
+from webapi.models import Summarization, ArticleCategory, ArticleList
 
 class SummarizationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -10,3 +10,8 @@ class ArticleCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ArticleCategory
         fields = ('media')
+
+class ArticleListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ArticleList
+        fields = ('media', 'url')

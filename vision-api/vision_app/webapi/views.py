@@ -39,3 +39,15 @@ class ArticleCategory(views.APIView):
 
         res = {f'category_{i}': str(c) for i, c in enumerate(article_category)}
         return Response(res)
+
+class ArticleList(views.APIView):
+    def get(self, request):
+        media = request.GET.get('media')
+        url = request.GET.get('url')
+
+        crawler = Crawling()
+        # article_list = crawler.get_article_list(int(media))
+        article_list = ['としまえん最後の週末 惜しむ声', '写真と違う料理 返金は可能？', 'ホンダ，通勤手当を廃止へ', 'マスクの転売規制を解除', '交通安全協会 入るメリットは']
+
+        res = {f'article_{i}': article for i, article in enumerate(article_list)}
+        return Response(res)
