@@ -19,7 +19,7 @@ class Crawling:
                             ["https://news.livedoor.com/article/detail/"],
                         ]
 
-    def getCategory(self, site_id):
+    def get_category(self, site_id):
         category = []
         html = requests.get(self.url_dict[site_id]['url'])
         soup = BeautifulSoup(html.content, 'html.parser')
@@ -44,11 +44,10 @@ class Crawling:
         else:   
             li_list = soup.find_all(class_=self.url_dict[site_id]['class'])
 
-        for li in li_list:
-            if site_id != 4:
-                category.append(li.string)
-            else:
-                category = li_list    
+        if site_id != 4:
+            category = [li.string for li in li_list]
+        else:
+            category = li_list
 
         return category
 
