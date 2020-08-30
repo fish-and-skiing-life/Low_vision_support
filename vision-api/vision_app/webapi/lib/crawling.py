@@ -29,7 +29,7 @@ class Crawling:
                             ["https://news.livedoor.com/article/detail/"],
                         ]
 
-    def getCategory(self, site_id):
+    def get_category(self, site_id):
         category = []
         html = requests.get(self.url_dict[site_id]['url'])
         soup = BeautifulSoup(html.content, 'html.parser')
