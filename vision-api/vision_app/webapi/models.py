@@ -20,7 +20,7 @@ class ArticleList(models.Model):
     """
     パラメータ
         media:  記事媒体 (Yahoo!, livedoor)
-        url:    記事一覧のURL
+        category_url:    任意のカテゴリの記事一覧のURL
     """
     media = models.CharField(max_length=128, null=False, default='unknown')
-    url = models.CharField(max_length=128, null=False, default='unknown')
+    category_url = models.CharField(max_length=128, null=False, default='unknown')

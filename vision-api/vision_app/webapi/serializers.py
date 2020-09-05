@@ -14,4 +14,4 @@ class ArticleCategorySerializer(serializers.ModelSerializer):
 class ArticleListSerializer(serializers.ModelSerializer):
     class Meta:
         model = ArticleList
-        fields = ('media', 'url')
+        fields = ('media', 'category_url')
