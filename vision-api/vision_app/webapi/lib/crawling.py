@@ -8,26 +8,18 @@ class Crawling:
                             {'url': "https://www.asahi.com/national/list/", 'class': "NavInner"},
                             {'url': "https://www.yomiuri.co.jp/life/", 'class': "p-header-category-list__sibling"},
                             {'url': "https://www.nikkei.com/business/archive/", 'class': "subpage-gnav__list"},
-                            {'url': "https://news.livedoor.com/topics/category/world/", 'class': "navInner"},
+                            {'url': "https://news.nicovideo.jp/categories/70?news_ref=top_header", 'class': "tabs"},
                         ]
 
         self.news_list_dict = [
                             "newsFeed_item",
                             "List",
-                            {'url': "https://www.yomiuri.co.jp/life/", 'class': "p-header-category-list__sibling"},
-                            {'url': "https://www.nikkei.com/business/archive/", 'class': "subpage-gnav__list"},
-                            {'url': "https://news.livedoor.com/topics/category/world/", 'class': "navInner"},
+                            "p-list-item",
+                            "m-miM09_title",
                         ]
 
-        self.base = [ "https://news.yahoo.co.jp","", "","https://www.nikkei.com", "", ]
+        self.base = [ "https://news.yahoo.co.jp","https://www.asahi.com/", "","https://www.nikkei.com", "https://news.nicovideo.jp"]
 
-        self.category_dict = [
-                            ["https://news.yahoo.co.jp/articles/"],
-                            ["https://www.asahi.com/articles/"],
-                            ["https://www.yomiuri.co.jp/"],
-                            ["https://www.nikkei.com/article/"],
-                            ["https://news.livedoor.com/article/detail/"],
-                        ]
 
     def get_category(self, site_id):
         category = []
@@ -50,32 +42,35 @@ class Crawling:
             for html in soup:
                 li_list.append(html.find("a"))
         elif(site_id == 4):
-            li_list= [
-                {"name": "主要", "url": "https://news.livedoor.com/topics/category/main/"},
-                {"name": "海外", "url": "https://news.livedoor.com/topics/category/world/"},
-                {"name": "IT 経済", "url": "https://news.livedoor.com/topics/category/eco/"},
-                {"name": "芸能", "url": "https://news.livedoor.com/topics/category/ent/"},
-                {"name": "スポーツ", "url": "https://news.livedoor.com/topics/category/sports/"},
-                {"name": "映画", "url": "https://news.livedoor.com/topics/category/52/"},
-                {"name": "グルメ", "url": "https://news.livedoor.com/topics/category/gourmet/"},
-                {"name": "女子", "url": "https://news.livedoor.com/topics/category/love/"},
-                {"name": "トレンド", "url": "https://news.livedoor.com/topics/category/trend/"}]
-
+            li_list = soup.select("ul.tabs li")
         else:   
             li_list = soup.find_all(class_=self.url_dict[site_id]['class'])
 
         for li in li_list:
             if site_id == 1 or site_id == 3:
-                if li.string != 'トップ' and li.string != "連載":
-                    category.append({'name': li.string, "url": self.base[site_id] + li.get('href').replace('?iref=pc_gnavi', 'list')})
-            elif site_id != 4:
+                if li.string != 'トップ' and li.string != "連載" and li.string != "オピニオン" and li.string != "スポーツ" and li.string != "医療・健康" and li.string != "地域":
+                    if site_id == 3:
+                        if li.string != '速報' and li.string != 'ライフ':
+                            category.append({'name': li.string, "url": self.base[site_id] + li.get('href')+ 'archive/'})
+                        elif li.string == '速報':
+                            category.append({'name': li.string, "url": self.base[site_id] + li.get('href')})
+
+                    else:
+                        category.append({'name': li.string, "url": self.base[site_id] + li.get('href').split('?')[0]})
+
+            elif site_id == 4:
+                try:
+                    if li.get_text() != "トップ":
+                        category.append({'name': li.get_text(), "url":self.base[site_id] +  li.find('a').get('href')})
+                except:
+                    print('error')
+            else:
                 try:
                     category.append({'name': li.get_text(), "url":self.base[site_id] +  li.find('a').get('href')})
                 except:
                     print('error')
-            else:
-                category = li_list   
-        print(category) 
+
+        print(category)
         return category
 
     def getArticleList(self,site_id ,category_url):
@@ -84,19 +79,80 @@ class Crawling:
         soup = BeautifulSoup(html.content, 'html.parser')
         if site_id == 1:   
             soup = soup.select("ul.List li")
+        elif site_id == 3:
+            article = []
+            article += soup.select(".m-miM09_title")
+            article += soup.select(".m-miM32_itemTitle")
+            soup = article
+        elif site_id == 4:
+            soup = soup.select("div.news-news-articles-list")
         else:
             soup = soup.find_all(class_= self.news_list_dict[site_id])
+
         for row in soup:
-            print('^^^^^^^^^^^^^^^^^^^^')
             try:
                 if(site_id == 1):
-                    news_list.append({"title": row.find('a').get_text(), "url": row.find('a').get('href'), "fee": row.find("img")})
+                    news_list.append({"title": row.find('a').get_text(), "url": self.base[site_id] +row.find('a').get('href'), "fee": row.find("img")})
+                elif(site_id == 2):
+                    split_list = row.find('a').get('href').split('/')
+                    if((len(split_list) == 6 or len(split_list) == 7) and '=' not in split_list[-1]):
+                        news_list.append({"title": row.find('a').string, "url": row.find('a').get('href'), "fee": row.find(class_="c-list-member-only")})
+                elif(site_id == 3):
+                    
+                    news_list.append({"title": row.find('a').get_text(), "url":'https://r.nikkei.com' +row.find('a').get('href'), "fee": row.find(class_="m-iconMember")})
+                elif(site_id == 4):
+                    news_list.append({"title": row.find(class_='news-title').get_text(), "url": self.base[site_id] +row.get('href') })
                 else:
                     news_list.append({"title": row.find('a').get_text(), "url": row.find('a').get('href')})
 
             except:
                 print(row)
+        
         print(news_list)
+        return news_list
+
+    def getArticle(self,site_id ,category_url):
+        html = requests.get(category_url)
+        soup = BeautifulSoup(html.content, 'html.parser')
+        article_body= ""
+        if site_id == 0:
+            soup = soup.find(class_="pickupMain_detailLink")
+            html = requests.get(soup.find('a').get('href'))
+            soup = BeautifulSoup(html.content, 'html.parser')
+            article = soup.find(id="uamods")
+            title = article.select('header h1')[0].get_text()
+            soup = soup.select('.article_body div')
+            for row in soup:
+                try:
+                    content = row.find(class_='yjDirectSLinkTarget').string
+                    article_body += content
+                except:
+                    print("error")
+        elif site_id == 1:
+            article = soup
+            title = article.select('.ArticleTitle .Title h1')[0].get_text()
+            soup = soup.select(".ArticleText p")
+            for row in soup:
+                article_body += row.string
+                print(article_body)
+
+        elif site_id == 2:
+            article = soup
+            title = article.select('.article-content .article-header h1')[0].get_text()
+            print(title)
+            soup = soup.select(".p-main-contents p")
+            for row in soup:
+                article_body += row.string
+                print(article_body)
+
+        elif site_id == 3:
+            article = soup
+            title = article.select('article header h1')[0].get_text()
+            soup = soup.select(".article__body .article__snippet p")
+            for row in soup:
+                article_body += row.string
+
+        return {"title": title, "body": article_body}
 
 
 

@@ -10,11 +10,9 @@ class ArticleSummarization(views.APIView):
     def get(self, request):
         media_dict = {
             '0': 'https://news.yahoo.co.jp/articles/',
-            '1': 'https://news.livedoor.com/article/detail/',
-            '2': 'https://mainichi.jp/articles/',
-            '3': 'https://www.asahi.com/articles/',
-            '4': 'https://www.yomiuri.co.jp/',
-            '5': 'https://www.nikkei.com/article/'
+            '1': 'https://www.asahi.com/articles/',
+            '2': 'https://www.yomiuri.co.jp/',
+            '3': 'https://www.nikkei.com/article/'
         }
         media = request.GET.get('media')
         article_id = request.GET.get('article_id')
@@ -36,6 +34,7 @@ class ArticleCategory(views.APIView):
 
         crawler = Crawling()
         article_category = crawler.get_category(int(media))
+
 
         res = {f'category_{i}': str(c) for i, c in enumerate(article_category)}
         return Response(res)
