@@ -73,7 +73,7 @@ class Crawling:
         print(category)
         return category
 
-    def getArticleList(self,site_id ,category_url):
+    def get_article_list(self,site_id ,category_url):
         news_list = {}
         html = requests.get(category_url)
         soup = BeautifulSoup(html.content, 'html.parser')
@@ -109,7 +109,7 @@ class Crawling:
         print(news_list)
         return news_list
 
-    def getArticle(self,site_id ,category_url):
+    def get_article(self,site_id ,category_url):
         html = requests.get(category_url)
         soup = BeautifulSoup(html.content, 'html.parser')
         article_body= ""
