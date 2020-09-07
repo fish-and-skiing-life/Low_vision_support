@@ -35,9 +35,7 @@ class ArticleCategory(views.APIView):
         crawler = Crawling()
         article_category = crawler.get_category(int(media))
 
-
-        res = {f'category_{i}': str(c) for i, c in enumerate(article_category)}
-        return Response(res)
+        return Response(article_category)
 
 class ArticleList(views.APIView):
     def get(self, request):
@@ -45,8 +43,20 @@ class ArticleList(views.APIView):
         url = request.GET.get('category_url')
 
         crawler = Crawling()
-        # article_list = crawler.get_article_list(int(media), category_url)
-        article_list = ['としまえん最後の週末 惜しむ声', '写真と違う料理 返金は可能？', 'ホンダ，通勤手当を廃止へ', 'マスクの転売規制を解除', '交通安全協会 入るメリットは']
+        article_list = crawler.getArticleList(int(media), url)
+        # article_list = ['としまえん最後の週末 惜しむ声', '写真と違う料理 返金は可能？', 'ホンダ，通勤手当を廃止へ', 'マスクの転売規制を解除', '交通安全協会 入るメリットは']
 
         res = {f'article_{i}': article for i, article in enumerate(article_list)}
-        return Response(res)
+        return Response(article_list)
+
+class Article(views.APIView):
+    def get(self, request):
+        media = request.GET.get('media')
+        url = request.GET.get('article_url')
+
+        crawler = Crawling()
+        article= crawler.get_article_list(int(media), url)
+        # article_list = ['としまえん最後の週末 惜しむ声', '写真と違う料理 返金は可能？', 'ホンダ，通勤手当を廃止へ', 'マスクの転売規制を解除', '交通安全協会 入るメリットは']
+
+        # res = {f'article_{i}': article for i, article in enumerate(article_list)}
+        return Response(article)

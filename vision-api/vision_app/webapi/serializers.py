@@ -15,3 +15,5 @@ class ArticleListSerializer(serializers.ModelSerializer):
     class Meta:
         model = ArticleList
         fields = ('media', 'category_url')
+
+

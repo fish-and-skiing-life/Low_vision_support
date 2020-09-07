@@ -22,7 +22,7 @@ class Crawling:
 
 
     def get_category(self, site_id):
-        category = []
+        category = {}
         html = requests.get(self.url_dict[site_id]['url'])
         soup = BeautifulSoup(html.content, 'html.parser')
         li_list = []
@@ -51,22 +51,22 @@ class Crawling:
                 if li.string != 'トップ' and li.string != "連載" and li.string != "オピニオン" and li.string != "スポーツ" and li.string != "医療・健康" and li.string != "地域":
                     if site_id == 3:
                         if li.string != '速報' and li.string != 'ライフ':
-                            category.append({'name': li.string, "url": self.base[site_id] + li.get('href')+ 'archive/'})
+                            category.setdefault(li.string, self.base[site_id] + li.get('href')+ 'archive/' )
                         elif li.string == '速報':
-                            category.append({'name': li.string, "url": self.base[site_id] + li.get('href')})
+                            category.setdefault(li.string, self.base[site_id] + li.get('href') )
 
                     else:
-                        category.append({'name': li.string, "url": self.base[site_id] + li.get('href').split('?')[0]})
+                        category.setdefault(li.string, self.base[site_id] + li.get('href').split('?')[0] )
 
             elif site_id == 4:
                 try:
                     if li.get_text() != "トップ":
-                        category.append({'name': li.get_text(), "url":self.base[site_id] +  li.find('a').get('href')})
+                        category.setdefault(li.get_text(), self.base[site_id] + li.find('a').get('href') )
                 except:
                     print('error')
             else:
                 try:
-                    category.append({'name': li.get_text(), "url":self.base[site_id] +  li.find('a').get('href')})
+                    category.setdefault(li.get_text(), self.base[site_id] + li.find('a').get('href') )
                 except:
                     print('error')
 
@@ -74,7 +74,7 @@ class Crawling:
         return category
 
     def getArticleList(self,site_id ,category_url):
-        news_list = []
+        news_list = {}
         html = requests.get(category_url)
         soup = BeautifulSoup(html.content, 'html.parser')
         if site_id == 1:   
@@ -92,19 +92,17 @@ class Crawling:
         for row in soup:
             try:
                 if(site_id == 1):
-                    news_list.append({"title": row.find('a').get_text(), "url": self.base[site_id] +row.find('a').get('href'), "fee": row.find("img")})
+                    news_list.setdefault(row.find('a').get_text(), {"url": self.base[site_id] +row.find('a').get('href'), "fee": row.find("img")} )
                 elif(site_id == 2):
                     split_list = row.find('a').get('href').split('/')
                     if((len(split_list) == 6 or len(split_list) == 7) and '=' not in split_list[-1]):
-                        news_list.append({"title": row.find('a').string, "url": row.find('a').get('href'), "fee": row.find(class_="c-list-member-only")})
+                        news_list.setdefault(row.find('a').string,{"url": row.find('a').get('href'), "fee": row.find(class_="c-list-member-only")})
                 elif(site_id == 3):
-                    
-                    news_list.append({"title": row.find('a').get_text(), "url":'https://r.nikkei.com' +row.find('a').get('href'), "fee": row.find(class_="m-iconMember")})
+                    news_list.setdefault(row.find('a').get_text(), {"url":'https://r.nikkei.com' +row.find('a').get('href'), "fee": row.find(class_="m-iconMember")})
                 elif(site_id == 4):
-                    news_list.append({"title": row.find(class_='news-title').get_text(), "url": self.base[site_id] +row.get('href') })
+                    news_list.setdefault(row.find(class_='news-title').get_text(), {"url": self.base[site_id] +row.get('href') } )
                 else:
-                    news_list.append({"title": row.find('a').get_text(), "url": row.find('a').get('href')})
-
+                    news_list.setdefault(row.find(class_="newsFeed_item_title").get_text(), {"url": row.find('a').get('href')})
             except:
                 print(row)
         

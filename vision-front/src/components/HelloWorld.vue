@@ -6,7 +6,7 @@
         <h1 class="title mt-10">Wellcome to<br> Low vision service</h1>
 
         <p class="speak mt-10">読みたいニュースサイトを選んでください。</p>
-        <p class="speak ">ニュースサイトは、ヤフーニュース、朝日新聞、読売新聞、日経新聞、ライブドアを利用できます。</p>
+        <p class="speak ">ニュースサイトは、ヤフーニュース、朝日新聞、読売新聞、日経新聞を利用できます。</p>
         <v-btn x-large color="primary" @click="startSpeech">{{ recognitionText }}</v-btn><br>
         <button @click="startTalk" class='read'>音声読み上げ</button>
         <p>{{ text }}</p>
@@ -70,16 +70,16 @@
         let u = new SpeechSynthesisUtterance();
         u.lang = 'ja-JP';
         u.rate = 1.3
-        u.text = 'ニュースサイトは、ヤフーニュース、朝日新聞、読売新聞、日経新聞、ライブドアを利用できます。';
+        u.text = 'ニュースサイトは、ヤフーニュース、朝日新聞、読売新聞、日経新聞を利用できます。';
         speechSynthesis.speak(u);
 
       },
     },
     watch:{
       text(val){
+        var exist = true
         if (val.match(/Yahoo/)) {
-          localStorage.site = 'Yahoo'
-          
+          localStorage.site = 'ヤフーニュース'
         }else if(val.match(/朝日新聞/)){
           localStorage.site = '朝日新聞'
         }
@@ -89,10 +89,20 @@
         else if(val.match(/日経新聞/)){
           localStorage.site = '日経新聞'
         }
-        else if(val.match(/ライブドア/)){
-          localStorage.site = 'ライブドア'  
+        else{
+          exist = false
         }
-        this.$router.push('./category')
+
+        if( exist){
+          this.$router.push('./category')
+        }else{
+          let u = new SpeechSynthesisUtterance();
+          u.lang = 'ja-JP';
+          u.rate = 1.3
+          u.text = 'もう一度お願いします。' + val + "と聞こえました。";
+          speechSynthesis.speak(u);
+        }
+        
       }
     }
   }
