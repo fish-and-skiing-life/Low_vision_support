@@ -8,20 +8,12 @@ from webapi.lib.crawling import Crawling
 
 class ArticleSummarization(views.APIView):
     def get(self, request):
-        media_dict = {
-            '0': 'https://news.yahoo.co.jp/articles/',
-            '1': 'https://news.livedoor.com/article/detail/',
-            '2': 'https://mainichi.jp/articles/',
-            '3': 'https://www.asahi.com/articles/',
-            '4': 'https://www.yomiuri.co.jp/',
-            '5': 'https://www.nikkei.com/article/'
-        }
         media = request.GET.get('media')
-        article_id = request.GET.get('article_id')
+        url = request.GET.get('url')
 
         # crawiling
         crawler = Crawling()
-        article = crawler.scraping_article(media, media_dict[media]+article_id)
+        article = crawler.scraping_article(int(media), url)
 
         # summarization
         model = LexRank()
