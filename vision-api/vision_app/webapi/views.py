@@ -15,11 +15,11 @@ class ArticleSummarization(views.APIView):
             '3': 'https://www.nikkei.com/article/'
         }
         media = request.GET.get('media')
-        article_id = request.GET.get('article_id')
+        url = request.GET.get('url')
 
         # crawiling
         crawler = Crawling()
-        article = crawler.scraping_article(media, media_dict[media]+article_id)
+        article = crawler.scraping_article(int(media), url)
 
         # summarization
         model = LexRank()
@@ -46,7 +46,7 @@ class ArticleList(views.APIView):
         article_list = crawler.getArticleList(int(media), url)
         # article_list = ['としまえん最後の週末 惜しむ声', '写真と違う料理 返金は可能？', 'ホンダ，通勤手当を廃止へ', 'マスクの転売規制を解除', '交通安全協会 入るメリットは']
 
-        res = {f'article_{i}': article for i, article in enumerate(article_list)}
+        # res = {f'article_{i}': article for i, article in enumerate(article_list)}
         return Response(article_list)
 
 class Article(views.APIView):

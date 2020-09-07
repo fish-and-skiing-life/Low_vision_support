@@ -4,7 +4,7 @@ from webapi.models import Summarization, ArticleCategory, ArticleList
 class SummarizationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Summarization
-        fields = ('media', 'article_id')
+        fields = ('media', 'url')
 
 class ArticleCategorySerializer(serializers.ModelSerializer):
     class Meta:
