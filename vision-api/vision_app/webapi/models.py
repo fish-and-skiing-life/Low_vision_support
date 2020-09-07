@@ -3,11 +3,11 @@ from django.db import models
 class Summarization(models.Model):
     """
     必要なパラメータ
-        記事媒体 (Yahoo!, livedoor)
-        ID (記事のURLについている数字の羅列とか)
+        media: 記事媒体 (Yahoo!, livedoor)
+        url: 記事URL
     """
     media = models.CharField(max_length=128, null=False, default='unknown')
-    article_id = models.TextField()
+    url = models.TextField()
 
 class ArticleCategory(models.Model):
     """
