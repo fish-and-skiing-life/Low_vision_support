@@ -131,7 +131,10 @@ class Crawling:
             title = article.select('.ArticleTitle .Title h1')[0].get_text()
             soup = soup.select(".ArticleText p")
             for row in soup:
-                article_body += row.string
+                try:
+                    article_body += row.string
+                except:
+                    continue
                 print(article_body)
 
         elif site_id == 2:
@@ -140,7 +143,10 @@ class Crawling:
             print(title)
             soup = soup.select(".p-main-contents p")
             for row in soup:
-                article_body += row.string
+                try:
+                    article_body += row.string
+                except:
+                    continue
                 print(article_body)
 
         elif site_id == 3:
