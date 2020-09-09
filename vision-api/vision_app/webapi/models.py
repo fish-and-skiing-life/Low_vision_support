@@ -1,26 +1,16 @@
 from django.db import models
+class Article(models.Model):
+    url = models.CharField(max_length=256)
+    title = models.CharField(max_length=256)
+    content = models.TextField(max_length=4000)
+    vector = models.FloatField()
 
-class Summarization(models.Model):
-    """
-    必要なパラメータ
-        media: 記事媒体 (Yahoo!, livedoor)
-        url: 記事URL
-    """
-    media = models.CharField(max_length=128, null=False, default='unknown')
-    url = models.TextField()
+class Named_entity(models.Model):
+    url = models.CharField(max_length=256)
+    word = models.TextField(max_length=256)
+    vector = models.FloatField()
 
-class ArticleCategory(models.Model):
-    """
-    パラメータ
-        media: 記事媒体 (Yahoo!, livedoor)
-    """
-    media = models.CharField(max_length=128, null=False, default='unknown')
-
-class ArticleList(models.Model):
-    """
-    パラメータ
-        media:  記事媒体 (Yahoo!, livedoor)
-        category_url:    任意のカテゴリの記事一覧のURL
-    """
-    media = models.CharField(max_length=128, null=False, default='unknown')
-    category_url = models.CharField(max_length=128, null=False, default='unknown')
+class Trend(models.Model):
+    word = models.CharField(max_length=256)
+    score = models.IntegerField()
+        

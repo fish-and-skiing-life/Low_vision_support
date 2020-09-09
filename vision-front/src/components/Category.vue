@@ -33,10 +33,12 @@
       }
     },
     async mounted(){
+      console.log('sdfsdfds')
       await axios
         .get(process.env.VUE_APP_API + ":8000/api/category", {params: { "media": this.site_dict[this.site] }})
         .then(response => {
           this.manuscript.push(this.site + 'で読めるカテゴリーは、')
+          console.log(response)
           this.category_list = response.data
           for(let key in response.data){
             this.categorys += key + "、"
@@ -46,7 +48,8 @@
             this.manuscript.push(key)
           }
           this.manuscript.push("があります。")
-        }).catch(() => {
+        }).catch(error => {
+          console.log('this is errior',error)
       })
       const recognition = new window.webkitSpeechRecognition()
       recognition.lang = "ja-JP";

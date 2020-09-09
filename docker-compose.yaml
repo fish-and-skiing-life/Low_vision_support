@@ -3,6 +3,7 @@ services:
   front:
     image: node:12.4.0-alpine
     container_name: vision-front
+    # image: inatetsu/vision-front
     build: ./vision-front
     ports:
       - 8080:8080
@@ -18,6 +19,7 @@ services:
 
   vision-api:
     build: ./vision-api
+    # image: inatetsu/vision-api
     ports:
       - 8000:8000
     volumes:
@@ -28,6 +30,34 @@ services:
     tty: true
     stdin_open: true
     privileged: true
+    depends_on:
+      - news-db
+      - wiki-db
+    environment:
+      - DB_news_NAME=news
+      - DB_wiki_NAME=wiki
+      - DB_USER=root
+      - DB_PASS=password
+      - DB_wiki_HOST=wiki-db
+      - DB_news_HOST=news-db
+
+  news-db:
+    build: ./news_db
+    volumes:
+      - ./news_db/data:/var/lib/mysql
+      - ./news_db/conf:/etc/mysql/conf.d
+      - ./news_db/init:/docker-entrypoint-initdb.d/
+    ports:
+      - 3307:3306
+
+  wiki-db:
+    build: ./wiki_db
+    volumes:
+      - ./wiki_db/data:/var/lib/mysql
+      - ./wiki_db/conf:/etc/mysql/conf.d
+      - ./wiki_db/init:/docker-entrypoint-initdb.d/
+    ports:
+      - 3308:3306
 
   #nginx:
   #  image: nginx:1.13

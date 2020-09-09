@@ -100,7 +100,8 @@
     watch:{
       text(val){
         const val_list = val.split('番')
-        localStorage.newsId = this.newsList[Number(val_list[4])].id
+        localStorage.newsTitle = this.newsList[Number(val_list[0])].id
+        localStorage.newsId = Number(val_list[0])
         this.$router.push('./news')
       }
     }
