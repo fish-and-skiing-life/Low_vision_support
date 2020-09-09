@@ -1,4 +1,5 @@
 from django.db import models
+
 class Article(models.Model):
     url = models.CharField(max_length=256)
     title = models.CharField(max_length=256)
@@ -13,4 +14,4 @@ class Named_entity(models.Model):
 class Trend(models.Model):
     word = models.CharField(max_length=256)
     score = models.IntegerField()
-        
+

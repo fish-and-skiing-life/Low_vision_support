@@ -56,7 +56,7 @@ class Crawling:
                             category.setdefault(li.string, self.base[site_id] + li.get('href') )
 
                     else:
-                        category.setdefault(li.string, self.base[site_id] + li.get('href').split('?')[0] )
+                        category.setdefault(li.get('href').split('?')[0])
 
             elif site_id == 4:
                 try:
