@@ -56,7 +56,7 @@ class Crawling:
                             category.setdefault(li.string, self.base[site_id] + li.get('href') )
 
                     else:
-                        category.setdefault(li.get('href').split('?')[0])
+                        category.setdefault(li.string, li.get('href').split('?')[0] + "list/", )
 
             elif site_id == 4:
                 try:
@@ -92,13 +92,20 @@ class Crawling:
         for row in soup:
             try:
                 if(site_id == 1):
-                    news_list.setdefault(row.find('a').get_text(), {"url": self.base[site_id] +row.find('a').get('href'), "fee": row.find("img")} )
+                    url = row.find('a').get('href')
+                    if self.base[site_id] not in url:
+                        url = self.base[site_id] + row.find('a').get('href')
+                    fee = True if  row.find("img") == None else False 
+                    print(row.find('a'))
+                    news_list.setdefault(row.find('a').get_text().split('(')[0], {"url":url, "fee": fee} )
                 elif(site_id == 2):
                     split_list = row.find('a').get('href').split('/')
                     if((len(split_list) == 6 or len(split_list) == 7) and '=' not in split_list[-1]):
-                        news_list.setdefault(row.find('a').string,{"url": row.find('a').get('href'), "fee": row.find(class_="c-list-member-only")})
+                        fee = True if row.find(class_="c-list-member-only") == None else False 
+                        news_list.setdefault(row.find('a').string,{"url": row.find('a').get('href'), "fee": fee})
                 elif(site_id == 3):
-                    news_list.setdefault(row.find('a').get_text(), {"url":'https://r.nikkei.com' +row.find('a').get('href'), "fee": row.find(class_="m-iconMember")})
+                    fee = True if row.find(class_="m-iconMember") == None else False 
+                    news_list.setdefault(row.find('a').get_text(), {"url":'https://r.nikkei.com' +row.find('a').get('href'), "fee": fee})
                 elif(site_id == 4):
                     news_list.setdefault(row.find(class_='news-title').get_text(), {"url": self.base[site_id] +row.get('href') } )
                 else:
@@ -118,11 +125,11 @@ class Crawling:
             html = requests.get(soup.find('a').get('href'))
             soup = BeautifulSoup(html.content, 'html.parser')
             article = soup.find(id="uamods")
-            title = article.select('header h1')[0].get_text()
+            title = article.select('h1')[0].get_text()
             soup = soup.select('.article_body div')
             for row in soup:
                 try:
-                    content = row.find(class_='yjDirectSLinkTarget').string
+                    content = row.find(class_='yjDirectSLinkTarget').get_text()
                     article_body += content
                 except:
                     print("error")
@@ -131,9 +138,11 @@ class Crawling:
             title = article.select('.ArticleTitle .Title h1')[0].get_text()
             soup = soup.select(".ArticleText p")
             for row in soup:
-                article_body += row.string
-                print(article_body)
-
+                try:
+                    article_body += row.string
+                except:
+                    print(row)
+                    
         elif site_id == 2:
             article = soup
             title = article.select('.article-content .article-header h1')[0].get_text()
@@ -145,10 +154,16 @@ class Crawling:
 
         elif site_id == 3:
             article = soup
+            body = soup
             title = article.select('article header h1')[0].get_text()
-            soup = soup.select(".article__body .article__snippet p")
+            body = body.select(".article__body .article__snippet p")
+            if len(body) == 0:
+                soup = soup.select(".article__body .article__content p")
+            else:
+                soup = body
+
             for row in soup:
-                article_body += row.string
+                article_body += row.get_text()
 
         return {"title": title, "body": article_body}
 

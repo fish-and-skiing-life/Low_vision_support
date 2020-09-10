@@ -17,18 +17,37 @@
 </template>
 
 <script>
+  import axios from 'axios';
   export default {
     data(){
       return {
         recognition : "",
         recognitionText: "音声入力開始",
         text: "",
+        site_dict: {"ヤフーニュース":0, "朝日新聞":1, "読売新聞":2, "日経新聞":3},
         abst: '明日は京都に行きたいと思ってます',
         site: localStorage.getItem("site"),
+        title: localStorage.getItem("newsTitle"),
+        titleUrl: localStorage.getItem("newsUrl"),
+        fee: localStorage.getItem("newsFee"),
         show: false
       }
     },
     async mounted(){
+      await axios
+        .get(process.env.VUE_APP_API + "/api/summarize", {params: { "media": this.site_dict[this.site], "url": this.titleUrl} })
+        .then(response => {
+          console.log(response.data)
+          this.manuscript.push('現在、' + this.site + 'の' + this.category + 'で読める記事のタイトルは、')
+          this.data = response.data
+          this.newsList = Object.keys(response.data)
+          for (const [index, key] of this.newsList.entries()) {
+            this.manuscript.push(String(index + 1) + "番、" + key)
+          }
+
+          this.manuscript.push("です。")
+        }).catch(() => {
+      })
       const recognition = new window.webkitSpeechRecognition()
       recognition.lang = "ja-JP";
       recognition.continuous = true;

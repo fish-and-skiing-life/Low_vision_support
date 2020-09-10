@@ -3,7 +3,7 @@ services:
   front:
     image: node:12.4.0-alpine
     container_name: vision-front
-    # image: inatetsu/vision-front
+    image: inatetsu/vision-front
     build: ./vision-front
     ports:
       - 8080:8080
@@ -19,7 +19,7 @@ services:
 
   vision-api:
     build: ./vision-api
-    # image: inatetsu/vision-api
+    image: inatetsu/vision-api
     ports:
       - 8000:8000
     volumes:

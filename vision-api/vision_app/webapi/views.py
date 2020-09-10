@@ -20,11 +20,13 @@ class ArticleSummarization(views.APIView):
         article = crawler.get_article(int(media), url)
 
         # summarization
+        print('start')
         model = LexRank()
         summary_list = model.summarize(article['body'])
+        print(summary_list)
         res = {f'summary_{i}': str(s) for i, s in enumerate(summary_list)}
         res['title'] = article['title']
-
+        print('end')
         return Response(res)
 
 class ArticleCategory(views.APIView):

@@ -33,12 +33,10 @@
       }
     },
     async mounted(){
-      console.log('sdfsdfds')
       await axios
-        .get(process.env.VUE_APP_API + ":8000/api/category", {params: { "media": this.site_dict[this.site] }})
+        .get(process.env.VUE_APP_API + "/api/category", {params: { "media": this.site_dict[this.site] }})
         .then(response => {
           this.manuscript.push(this.site + 'で読めるカテゴリーは、')
-          console.log(response)
           this.category_list = response.data
           for(let key in response.data){
             this.categorys += key + "、"

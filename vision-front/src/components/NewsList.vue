@@ -45,8 +45,9 @@
     },
     async mounted(){
       await axios
-        .get(process.env.VUE_APP_API + ":8000/api/article_list", {params: { "media": this.site_dict[this.site], "category_url": this.category_url} })
+        .get(process.env.VUE_APP_API + "/api/article_list", {params: { "media": this.site_dict[this.site], "category_url": this.category_url} })
         .then(response => {
+
           this.manuscript.push('現在、' + this.site + 'の' + this.category + 'で読める記事のタイトルは、')
           this.data = response.data
           this.newsList = Object.keys(response.data)
@@ -100,8 +101,9 @@
     watch:{
       text(val){
         const val_list = val.split('番')
-        localStorage.newsTitle = this.newsList[Number(val_list[0])].id
-        localStorage.newsId = Number(val_list[0])
+        localStorage.newsTitle = this.newsList[Number(val_list[0] -1)]
+        localStorage.newsUrl = this.data[this.newsList[Number(val_list[0]) -1]]['url']
+        localStorage.newsFee = this.data[this.newsList[Number(val_list[0]) -1]]['fee']
         this.$router.push('./news')
       }
     }
