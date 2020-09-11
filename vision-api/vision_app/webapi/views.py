@@ -1,5 +1,6 @@
 from rest_framework.response import Response
 from rest_framework import views
+import spacy
 
 from webapi.lib.summarizer import LexRank
 from webapi.lib.crawling import Crawling
@@ -25,6 +26,12 @@ class ArticleSummarization(views.APIView):
         res = {f'summary_{i}': str(s) for i, s in enumerate(summary_list)}
         res['title'] = article['title']
 
+        # ner
+        nlp = spacy.load('ja_ginza')
+        for i, summary in enumerate(summary_list):
+            doc = nlp(summary)
+            res[f'ne_list_{i}'] = ' '.join([str(ent.text) for ent in doc.ents])
+            
         return Response(res)
 
 class ArticleCategory(views.APIView):
