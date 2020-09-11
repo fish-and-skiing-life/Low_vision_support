@@ -1,6 +1,10 @@
+import datetime
+
 from rest_framework.response import Response
 from rest_framework import views
 import spacy
+import pandas as pd
+from pytrends.request import TrendReq
 
 from webapi.lib.summarizer import LexRank
 from webapi.lib.crawling import Crawling
@@ -23,15 +27,28 @@ class ArticleSummarization(views.APIView):
         # summarization
         model = LexRank()
         summary_list = model.summarize(article['body'])
-        res = {f'summary_{i}': str(s) for i, s in enumerate(summary_list)}
-        res['title'] = article['title']
+        res = {'summary': summary_list, 'title': article['title']}
 
         # ner
         nlp = spacy.load('ja_ginza')
+        ne_list = []
         for i, summary in enumerate(summary_list):
-            doc = nlp(summary)
-            res[f'ne_list_{i}'] = ' '.join([str(ent.text) for ent in doc.ents])
-            
+            doc = nlp(str(summary))
+            for ent in doc.ents:
+                ne_list.append(str(ent.text))
+
+        res['ne_list'] = ne_list
+
+        # trends
+        dt_now = datetime.datetime.now()
+        start_frame = (dt_now - datetime.timedelta(weeks=2)).strftime('%Y-%m-%d')
+        end_frame = dt_now.strftime('%Y-%m-%d')
+        pytrend.build_payload(keyword, cat=0, timeframe=f'{start_frame} {end_frame}', geo='JP')
+
+        data = pytrend.interest_over_time().drop(['isPartial'], axis=1)
+        search_dict = data.apply(lambda col: col.sum()).to_dict()
+        res['trends'] = search_dict
+
         return Response(res)
 
 class ArticleCategory(views.APIView):
