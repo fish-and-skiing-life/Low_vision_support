@@ -141,7 +141,7 @@ class Crawling:
                 try:
                     article_body += row.string
                 except:
-                    print(row)
+                    continue
                     
         elif site_id == 2:
             article = soup
@@ -149,7 +149,10 @@ class Crawling:
             print(title)
             soup = soup.select(".p-main-contents p")
             for row in soup:
-                article_body += row.string
+                try:
+                    article_body += row.string
+                except:
+                    continue
                 print(article_body)
 
         elif site_id == 3:
