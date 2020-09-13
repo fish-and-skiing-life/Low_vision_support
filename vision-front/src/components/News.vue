@@ -81,16 +81,22 @@
         }
         // this.recognition.stop()
       };
-      recognition.start()
+      // recognition.start()
     },
     methods:{
       sleep(waitMsec) {
         window.setTimeout(() => {},waitMsec)
       },
       calcHot(word){
-        console.log(word, word in this.news.ne_list)
         if(this.news.ne_list.indexOf(word) !== -1){
-          return ['large_word']
+          if(this.news.trends[word] > 500){
+            return ['large_word']
+          }else if(this.news.trends[word] > 300){
+            return ['midle_word']
+          }else if(this.news.trends[word] > 100){
+            return ['small_word']
+          }
+          
         }
         return []
       },
@@ -98,24 +104,14 @@
         await this.recognition.start()
       },
       startTalk: function() {
-        let welcome = new SpeechSynthesisUtterance();
-        welcome.lang = 'ja-JP';
-        welcome.rate = 1.3
-        welcome.text = '読みたいカテゴリーを選んでください。';
-        speechSynthesis.speak(welcome);
-        this.sleep(1)
-        let news = new SpeechSynthesisUtterance();
-        news.lang = 'ja-JP';
-        news.rate = 1.3
-        news.text = '読みたいニュースサイトを選んでください。';
-        speechSynthesis.speak(news);
-
-        this.sleep(1)
-        let u = new SpeechSynthesisUtterance();
-        u.lang = 'ja-JP';
-        u.rate = 1.3
-        u.text = 'ニュースサイトは、Yahooニュース、朝日新聞、読売新聞、日経新聞、ライブドアを利用できます。';
-        speechSynthesis.speak(u);
+        for(var index in this.manuscript){
+          let welcome = new SpeechSynthesisUtterance();
+          welcome.lang = 'ja-JP';
+          welcome.rate = 1.3
+          welcome.text = this.manuscript[index];
+          speechSynthesis.speak(welcome);
+          this.sleep(1)
+        }
 
       },
     },

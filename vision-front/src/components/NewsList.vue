@@ -73,7 +73,7 @@
         if (event.results.length > 0) {
           this.text = event.results[0][0].transcript;
         }
-        // this.recognition.stop()
+        this.recognition.stop()
       };
       recognition.start()
     },
@@ -98,14 +98,44 @@
         }
 
       },
+      Kan2Num(str) {
+        const kans = '〇一二三四五六七八九';
+        const nums = '０１２３４５６７８９';
+        let tmp;  // 定数kansまたはnumsを1文字ずつ格納する変数
+        for (let i = 0; i < kans.length; i++) {
+          tmp = new RegExp(kans[i], "g");  // RegExpオブジェクトを使用（該当文字を全て変換するため）
+          str = str.replace(tmp, i);  // replaceメソッドで変換
+        }
+        for (let i = 0; i < nums.length; i++) {
+          tmp = new RegExp(nums[i], "g");  // RegExpオブジェクトを使用（該当文字を全て変換するため）
+          str = str.replace(tmp, i);  // replaceメソッドで変換
+        }
+        return str;
+      }
     },
     watch:{
       text(val){
+        if(val == "サンバ"){
+          val = "3番"
+        }
         const val_list = val.split('番')
-        localStorage.newsTitle = this.newsList[Number(val_list[0] -1)]
-        localStorage.newsUrl = this.data[this.newsList[Number(val_list[0]) -1]]['url']
-        localStorage.newsFee = this.data[this.newsList[Number(val_list[0]) -1]]['fee']
-        this.$router.push('./news')
+        if(val_list.length == 2){
+          var num = this.Kan2Num(val_list[0])
+          console.log(num)
+          localStorage.newsTitle = this.newsList[num - 1]
+          localStorage.newsUrl = this.data[this.newsList[num -1]]['url']
+          localStorage.newsFee = this.data[this.newsList[num -1]]['fee']
+          this.$router.push('./news')
+        }else{
+          console.log('enadf')
+
+          let u = new SpeechSynthesisUtterance();
+          u.lang = 'ja-JP';
+          u.rate = 1.3
+          u.text = 'もう一度お願いします。' + val + "と聞こえました。";
+          speechSynthesis.speak(u);
+          this.startSpeech()
+        } 
       }
     }
   }

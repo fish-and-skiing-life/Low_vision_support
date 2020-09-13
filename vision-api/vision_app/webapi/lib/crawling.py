@@ -48,7 +48,7 @@ class Crawling:
 
         for li in li_list:
             if site_id == 1 or site_id == 3:
-                if li.string != 'トップ' and li.string != "連載" and li.string != "オピニオン" and li.string != "スポーツ" and li.string != "医療・健康" and li.string != "地域":
+                if li.string != 'トップ' and li.string != "連載" and li.string != "オピニオン" and li.string != "スポーツ" and li.string != "医療・健康" and li.string != "地域" and li.string != "マーケット":
                     if site_id == 3:
                         if li.string != '速報' and li.string != 'ライフ':
                             category.setdefault(li.string, self.base[site_id] + li.get('href')+ 'archive/' )

@@ -37,13 +37,14 @@
         .get(process.env.VUE_APP_API + "/api/category", {params: { "media": this.site_dict[this.site] }})
         .then(response => {
           this.manuscript.push(this.site + 'で読めるカテゴリーは、')
-          this.category_list = response.data
+          this.category_dict = response.data
           for(let key in response.data){
-            this.categorys += key + "、"
+            this.category_dict[key.replace(/\r?\n/g,"")] = response.data[key]
+            this.categorys += key.replace(/\r?\n/g,"") + "、"
             if(key.match(/IT/)){
               key = key.replace('IT','アイティー')
             }
-            this.manuscript.push(key)
+            this.manuscript.push(key.replace(/\r?\n/g,""))
           }
           this.manuscript.push("があります。")
         }).catch(error => {
@@ -63,7 +64,7 @@
         if (event.results.length > 0) {
           this.text = event.results[0][0].transcript;
         }
-        // this.recognition.stop()
+        this.recognition.stop()
       };
       recognition.start()
     },
@@ -98,12 +99,29 @@
         if(val.match(/it/)){
           val = "IT"
         }
-        if(this.category_list[val]){
+        else if(val.match(/社会/ && val.match(/暮らし/))){
+          val = "社会・くらし"
+          console.log(val)
+        }
+        else if(val.match(/エンタメ/ && val.match(/文化/))){
+          val = "エンタメ・文化"
+          console.log(val)
+        }
+        else if(val.match(/囲碁/ && val.match(/将棋/))){
+          val = "囲碁・将棋"
+          console.log(val)
+        }
+        console.log(this.category_dict)
+        if(this.category_dict[val]){
           localStorage.category = val
-          localStorage.category_url = this.category_list[val]
+          localStorage.category_url = this.category_dict[val]
           this.$router.push('./news-list')
         }else{
-          console.log(val)
+          let u = new SpeechSynthesisUtterance();
+          u.lang = 'ja-JP';
+          u.rate = 1.3
+          u.text = 'もう一度お願いします。' + val + "と聞こえました。";
+          speechSynthesis.speak(u);
         }
       }
     }
