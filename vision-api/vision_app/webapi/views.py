@@ -1,5 +1,6 @@
 from rest_framework.response import Response
 from rest_framework import views
+import spacy
 
 from webapi.lib.summarizer import LexRank
 from webapi.lib.crawling import Crawling
@@ -20,13 +21,19 @@ class ArticleSummarization(views.APIView):
         article = crawler.get_article(int(media), url)
 
         # summarization
-        print('start')
         model = LexRank()
         summary_list = model.summarize(article['body'])
-        print(summary_list)
-        res = {f'summary_{i}': str(s) for i, s in enumerate(summary_list)}
-        res['title'] = article['title']
-        print('end')
+        res = {'summary': summary_list, 'title': article['title']}
+
+        # ner
+        nlp = spacy.load('ja_ginza')
+        ne_list = []
+        for i, summary in enumerate(summary_list):
+            doc = nlp(str(summary))
+            for ent in doc.ents:
+                ne_list.append(str(ent.text))
+            
+        res['ne_list'] = ne_list
         return Response(res)
 
 class ArticleCategory(views.APIView):
@@ -45,7 +52,5 @@ class ArticleList(views.APIView):
 
         crawler = Crawling()
         article_list = crawler.get_article_list(int(media), url)
-        # article_list = ['としまえん最後の週末 惜しむ声', '写真と違う料理 返金は可能？', 'ホンダ，通勤手当を廃止へ', 'マスクの転売規制を解除', '交通安全協会 入るメリットは']
 
-        # res = {f'article_{i}': article for i, article in enumerate(article_list)}
         return Response(article_list)

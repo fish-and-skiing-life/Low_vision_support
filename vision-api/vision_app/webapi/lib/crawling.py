@@ -18,7 +18,7 @@ class Crawling:
                             "m-miM09_title",
                         ]
 
-        self.base = [ "https://news.yahoo.co.jp","https://www.asahi.com/", "","https://www.nikkei.com", "https://news.nicovideo.jp"]
+        self.base = [ "https://news.yahoo.co.jp","https://www.asahi.com", "","https://www.nikkei.com", "https://news.nicovideo.jp"]
 
 
     def get_category(self, site_id):
@@ -142,7 +142,7 @@ class Crawling:
                     article_body += row.string
                 except:
                     continue
-                    
+
         elif site_id == 2:
             article = soup
             title = article.select('.article-content .article-header h1')[0].get_text()

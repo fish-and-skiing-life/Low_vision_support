@@ -10,7 +10,9 @@
   "dependencies": {
     "axios": "^0.20.0",
     "core-js": "^3.6.5",
+    "google-trends-api": "^4.9.0",
     "vue": "^2.6.11",
+    "vue-loading-overlay": "^3.4.0",
     "vue-router": "^3.4.3",
     "vue-speech": "^0.1.0",
     "vuetify": "^2.2.11",

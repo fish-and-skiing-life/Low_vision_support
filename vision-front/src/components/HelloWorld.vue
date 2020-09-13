@@ -43,8 +43,9 @@
         if (event.results.length > 0) {
           this.text = event.results[0][0].transcript;
         }
-        this.recognition.stop()
+        // this.recognition.stop()
       };
+      recognition.start()
     },
     methods:{
       sleep(waitMsec) {
