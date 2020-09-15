@@ -1,5 +1,19 @@
 <template>
+  <div>
+    <loading 
+      :active.sync="isLoading" 
+      :is-full-page="fullPage"
+      background-color='#000'
+      color= '#fff'
+      :height= '150'
+      :width ="150"
+      :opacity='0.8'
+      loader = "bars"
+      >  
+    </loading>
   <v-container>
+    
+
     <v-row class="text-center">
       <v-col cols="12">
         
@@ -21,13 +35,21 @@
       
     </v-row>
   </v-container>
+</div>
 </template>
 
 <script>
+  import Loading from 'vue-loading-overlay';
+  import 'vue-loading-overlay/dist/vue-loading.css';
   import axios from 'axios';
   export default {
+    components: {
+      Loading
+    },
     data(){
       return {
+        isLoading: true,
+        fullPage: true,
         recognition : "",
         recognitionText: "音声入力開始",
         text: "",
@@ -41,7 +63,9 @@
         show: false,
         news: {},
         content: [],
-        regular_expresion: ""
+        regular_expresion: "",
+        reccomendscript: '何か気になった単語はありましたか？。オススメの関連ニュースを読みますか？。回答は、単語を調べる、関連ニュースを読むのどちらかでお願いします。',
+        recommend: []
       }
     },
     async mounted(){
@@ -63,7 +87,6 @@
       for(var row in this.news.summary){
         this.content.push( this.news.summary[row].split(this.regular_expresion) )
       }
-      console.log(this.content)
 
       const recognition = new window.webkitSpeechRecognition()
       recognition.lang = "ja-JP";
@@ -82,6 +105,7 @@
         // this.recognition.stop()
       };
       // recognition.start()
+      this.isLoading = false
     },
     methods:{
       sleep(waitMsec) {
@@ -117,9 +141,11 @@
     },
     watch:{
       text(val){
-        if (this.text.match(/Yahoo/)) {
-          localStorage.site = 'Yahooニュース'
-          this.$router.push('./category')
+        if (this.text.match(/関連ニュース/)) {
+          this.$router.push('./words')
+        }
+        else if(this.text.match(/単語/)){
+          this.$router.push('./recommend')
         }
         console.log(val)
       }

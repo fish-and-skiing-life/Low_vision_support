@@ -7,6 +7,8 @@ const Dashboard = () => import('@/components/HelloWorld');
 const Category = () => import('@/components/Category');
 const News = () => import('@/components/News');
 const NewsList = () => import('@/components/NewsList');
+const RecommendList = () => import('@/components/RecommendList');
+const Wiki = () => import('@/components/Wiki');
 Vue.use(Router)
 
 export default new Router({
@@ -34,6 +36,16 @@ export default new Router({
     path: '/news',
     name: "news",
     components: {default: News }
+  },
+  {
+    path: '/recommend_list',
+    name: "RecommendList",
+    components: {default: RecommendList }
+  },
+  {
+    path: '/wiki',
+    name: "Wiki",
+    components: {default: Wiki }
   },
   ]}
   ]
