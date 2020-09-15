@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'webapi',
     'rest_framework',
-    'corsheaders',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -85,14 +85,6 @@ DATABASES = {
         'USER': os.getenv('DB_USER', 'root'),
         'PASSWORD':os.getenv('DB_PASS', 'password'),
         'HOST': os.getenv('DB_news_HOST', 'news-db'),
-        'PORT': '3306',
-    },
-    'wiki_db': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('DB_wiki_NAME', 'wiki'),
-        'USER': os.getenv('DB_USER', 'root'),
-        'PASSWORD':os.getenv('DB_PASS', 'password'),
-        'HOST': os.getenv('DB_wiki_HOST', 'wiki-db'),
         'PORT': '3306',
     }
 }

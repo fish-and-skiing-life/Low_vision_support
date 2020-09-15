@@ -50,15 +50,6 @@ services:
     ports:
       - 3307:3306
 
-  wiki-db:
-    build: ./wiki_db
-    volumes:
-      - ./wiki_db/data:/var/lib/mysql
-      - ./wiki_db/conf:/etc/mysql/conf.d
-      - ./wiki_db/init:/docker-entrypoint-initdb.d/
-    ports:
-      - 3308:3306
-
   #nginx:
   #  image: nginx:1.13
   #  ports:
