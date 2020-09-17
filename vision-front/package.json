@@ -15,6 +15,7 @@
     "vue-loading-overlay": "^3.4.0",
     "vue-router": "^3.4.3",
     "vue-speech": "^0.1.0",
+    "vue-text-to-speech": "^1.0.6",
     "vuetify": "^2.2.11",
     "vuex": "^3.5.1"
   },

@@ -9,25 +9,32 @@ from pytrends.request import TrendReq
 from webapi.lib.summarizer import LexRank
 from webapi.lib.crawling import Crawling
 
+from .models import Wiki
+
 
 def summariz(title, body ):
     # summarization
     model = LexRank()
     summary_list = model.summarize(body)
     res = {'summary': summary_list, 'title': title}
-
-    # ner
-    nlp = spacy.load('ja_ginza')
-    ne_list = []
-    for i, summary in enumerate(summary_list):
-        doc = nlp(str(summary))
-        for ent in doc.ents:
-            ne_list.append(str(ent.text))
-
-    ne_list = list(set(ne_list))
+    ne_list = extract_named(summary_list)
     res['ne_list'] = ne_list
 
     # trends
+    res['trends'] = get_trend(ne_list)
+    return res
+
+def extract_named(doc_list):
+    nlp = spacy.load('ja_ginza')
+    ne_list = []
+    for i, doc in enumerate(doc_list):
+        doc_split = nlp(str(doc))
+        for ent in doc_split.ents:
+            ne_list.append(str(ent.text))
+
+    return list(set(ne_list))
+
+def get_trend(ne_list):
     search_dict = {}
     dt_now = datetime.datetime.now()
     start_frame = (dt_now - datetime.timedelta(weeks=2)).strftime('%Y-%m-%d')
@@ -40,7 +47,8 @@ def summariz(title, body ):
         data = pytrend.interest_over_time().drop(['isPartial'], axis=1)
         search_dict.update(data.apply(lambda col: col.sum()).to_dict())
 
-    return res
+    return search_dict
+
 
 class ArticleSummarization(views.APIView):
     def get(self, request):
@@ -58,36 +66,10 @@ class ArticleSummarization(views.APIView):
         article = crawler.get_article(int(media), url)
         print(article)
         # summarization
-        model = LexRank()
-        summary_list = model.summarize(article['body'])
-        res = {'summary': summary_list, 'title': article['title']}
 
-        # ner
-        nlp = spacy.load('ja_ginza')
-        ne_list = []
-        for i, summary in enumerate(summary_list):
-            doc = nlp(str(summary))
-            for ent in doc.ents:
-                ne_list.append(str(ent.text))
+        summariz(article['title'], article['body'])
 
-        ne_list = list(set(ne_list))
-        res['ne_list'] = ne_list
-
-        # trends
-        search_dict = {}
-        dt_now = datetime.datetime.now()
-        start_frame = (dt_now - datetime.timedelta(weeks=2)).strftime('%Y-%m-%d')
-        end_frame = dt_now.strftime('%Y-%m-%d')
-        pytrend = TrendReq(hl='jp-JP', tz=-540)
-
-        for num in range(0, len(ne_list),5):
-            pytrend.build_payload(ne_list[num : num+4], cat=0, timeframe=f'{start_frame} {end_frame}', geo='JP')
-
-            data = pytrend.interest_over_time().drop(['isPartial'], axis=1)
-            search_dict.update(data.apply(lambda col: col.sum()).to_dict())
-        res['trends'] = search_dict
-
-        return Response(res)
+        return Response(summariz(article['title'], article['body']))
 
 class ArticleCategory(views.APIView):
     def get(self, request):
@@ -103,10 +85,12 @@ class ArticleList(views.APIView):
         media = request.GET.get('media')
         url = request.GET.get('category_url')
 
+        ne_list = []
         crawler = Crawling()
         article_list = crawler.get_article_list(int(media), url)
-
-        return Response(article_list)
+        ne_list = extract_named(article_list)
+        res = {'article_list': article_list, 'ne_list': ne_list, 'trends': get_trend(ne_list) } 
+        return Response(res)
 
 class RecommendList(views.APIView):
     def get(self, request):
@@ -137,6 +121,8 @@ class Recommend(views.APIView):
 class Wiki(views.APIView):
     def get(self, request):
         word = request.GET.get('word')
+        wiki = Wiki.objects.filter(title = word)
+        print(wiki)
         res = {'word': word,
                 "summary": 'summary'
                    
