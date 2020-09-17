@@ -4,7 +4,7 @@ services:
     image: node:12.4.0-alpine
     container_name: vision-front
     image: inatetsu/vision-front
-    build: ./vision-front
+    # build: ./vision-front
     ports:
       - 8080:8080
     volumes:
@@ -12,13 +12,13 @@ services:
     stdin_open: true
     privileged: true
     tty: true
-    command: npm run serve 
+    # command: npm run serve 
     environment:
       VUE_APP_API: http://localhost:8000
 
 
   vision-api:
-    build: ./vision-api
+    # build: ./vision-api
     image: inatetsu/vision-api
     ports:
       - 8000:8000
@@ -32,7 +32,6 @@ services:
     privileged: true
     depends_on:
       - news-db
-      - wiki-db
     environment:
       - DB_news_NAME=news
       - DB_wiki_NAME=wiki
