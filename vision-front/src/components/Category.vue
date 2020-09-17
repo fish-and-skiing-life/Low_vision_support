@@ -7,9 +7,7 @@
 
         <p class="speak mt-10">読みたいカテゴリーを選んでください。</p>
         <p class="speak ">カテゴリーは{{ categorys }}があります。</p>
-        <v-btn x-large color="primary" @click="startSpeech">{{ recognitionText }}</v-btn><br>
-        <button @click="startTalk" class='read'>音声読み上げ</button>
-        <p>{{ text }}</p>
+        <v-btn class='regnitional-btn' color="primary" @click="startSpeech">{{ recognitionText }}</v-btn><br>
       </v-col>
       
     </v-row>
@@ -21,6 +19,7 @@
   export default {
     data(){
       return {
+        speech: window.speechSynthesis,
         recognition : "",
         recognitionText: "カテゴリーを選ぶ",
         text: "",
@@ -29,7 +28,7 @@
         category_dict: {},
         manuscript: [],
         categorys: "",
-        show: false
+        show: false,
       }
     },
     async mounted(){
@@ -66,6 +65,7 @@
         }
         this.recognition.stop()
       };
+      await this.startTalk()
       recognition.start()
     },
     methods:{
@@ -75,23 +75,15 @@
       async startSpeech() {
         await this.recognition.start()
       },
-      speech(val){
-        let welcome = new SpeechSynthesisUtterance();
-        welcome.lang = 'ja-JP';
-        welcome.rate = 1.3
-        welcome.text = val;
-        speechSynthesis.speak(welcome);
-      },
       startTalk: function() {
         for(var index in this.manuscript){
           let welcome = new SpeechSynthesisUtterance();
           welcome.lang = 'ja-JP';
           welcome.rate = 1.3
           welcome.text = this.manuscript[index];
-          speechSynthesis.speak(welcome);
-          this.sleep(1)
+          this.speech.speak(welcome);
         }
-      
+        this.isSpaking = this.speech.speaking
       },
     },
     watch:{
@@ -111,20 +103,21 @@
           val = "囲碁・将棋"
           console.log(val)
         }
-        console.log(this.category_dict)
         if(this.category_dict[val]){
           localStorage.category = val
           localStorage.category_url = this.category_dict[val]
           this.$router.push('./news-list')
         }else{
+          this.speech.cancel()
           let u = new SpeechSynthesisUtterance();
           u.lang = 'ja-JP';
           u.rate = 1.3
           u.text = 'もう一度お願いします。' + val + "と聞こえました。";
-          speechSynthesis.speak(u);
+          this.speech.speak(u);
         }
       }
     }
+
   }
 </script>
 
@@ -143,6 +136,13 @@
 
 .v-btn__content{
   font-size: 2em !important;
+}
+
+.regnitional-btn{
+  height: 100px !important;
+  min-width: 94px !important;
+  font-size: 3em !important;
+  padding: 0.5em !important;
 }
 
 @media screen and (min-width:480px) and (max-width:768px) {

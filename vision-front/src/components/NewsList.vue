@@ -15,9 +15,7 @@
             <v-list-item-title class='news_title mb-4'>{{i + 1}}.  {{news}}</v-list-item-title>
           </v-list-item>
         </v-list>       
-        <v-btn x-large color="primary" @click="startSpeech">{{ recognitionText }}</v-btn><br>
-        <button @click="startTalk" class='read'>音声読み上げ</button>
-        <p>{{ text }}</p>
+        <v-btn class='regnitional-btn' color="primary" @click="startSpeech">{{ recognitionText }}</v-btn><br>
       </v-col>
       
     </v-row>
@@ -47,12 +45,15 @@
       await axios
         .get(process.env.VUE_APP_API + "/api/article_list", {params: { "media": this.site_dict[this.site], "category_url": this.category_url} })
         .then(response => {
-
+          this.manuscript.push('記事の選択は1番のように、記事の番号で選択してください。')
           this.manuscript.push('現在、' + this.site + 'の' + this.category + 'で読める記事のタイトルは、')
           this.data = response.data
           this.newsList = Object.keys(response.data)
           for (const [index, key] of this.newsList.entries()) {
-            this.manuscript.push(String(index + 1) + "番、" + key)
+            if(index < 5){
+              this.manuscript.push(String(index + 1) + "番、" + key)
+
+            }
           }
 
           this.manuscript.push("です。")
@@ -75,6 +76,7 @@
         }
         this.recognition.stop()
       };
+      await this.startTalk()
       recognition.start()
     },
     methods:{
@@ -127,7 +129,7 @@
           localStorage.newsFee = this.data[this.newsList[num -1]]['fee']
           this.$router.push('./news')
         }else{
-          console.log('enadf')
+          this.speech.cancel()
 
           let u = new SpeechSynthesisUtterance();
           u.lang = 'ja-JP';
@@ -155,12 +157,19 @@
 }
 
 .news_title{
-  font-size: 2em !important;
+  font-size: 3em !important;
   line-height: 1.5em !important;
 }
 
+.regnitional-btn{
+  height: 100px !important;
+  min-width: 94px !important;
+  font-size: 3em !important;
+  padding: 0.5em !important;
+}
+
 .v-btn__content{
-  font-size: 2em !important;
+  margin: 20px;
 }
 
 @media screen and (min-width:480px) and (max-width:768px) {
