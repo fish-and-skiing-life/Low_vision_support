@@ -163,7 +163,7 @@
           this.$router.push('./recommend_list')
         }
         else if(this.text.match(/単語/)){
-          this.$router.push('./words')
+          this.$router.push('./wiki')
         }else{
           this.speech.cancel()
 
