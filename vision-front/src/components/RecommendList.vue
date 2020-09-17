@@ -17,18 +17,14 @@
     <v-row class="text-center">
       <v-col cols="12">
         
-        <h1 class="title mt-10">{{title}}</h1>
+        <h1 class="title mt-10">関連ニュース</h1>
 
-        <p class="speak mt-10">要約文</p>
         <!-- <p> {{ news }}</p> -->
-        <p class="speak mt-10" v-for='row in content' :key="row">
-          <span v-for='word in row' :key="word" :class='calcHot(word)'>
-            {{ word}}
-          </span>
-          
-        </p>
+        <p class="speak mt-10" v-for='row in recommend' :key="row">{{ row }}</p>
 
-        <v-btn class='regnitional-btn' color="primary" @click="startSpeech">{{ recognitionText }}</v-btn><br>
+        <v-btn x-large color="primary" @click="startSpeech">{{ recognitionText }}</v-btn><br>
+        <button @click="startTalk" class='read'>音声読み上げ</button>
+        <p>{{ text }}</p>
       </v-col>
       
     </v-row>
@@ -46,50 +42,37 @@
     },
     data(){
       return {
-        speech: window.speechSynthesis,
         isLoading: true,
         fullPage: true,
         recognition : "",
         recognitionText: "音声入力開始",
         text: "",
         site_dict: {"ヤフーニュース":0, "朝日新聞":1, "読売新聞":2, "日経新聞":3},
-        abst: '明日は京都に行きたいと思ってます',
         site: localStorage.getItem("site"),
         title: localStorage.getItem("newsTitle"),
         titleUrl: localStorage.getItem("newsUrl"),
         fee: localStorage.getItem("newsFee"),
         manuscript: [],
+        data: {},
         show: false,
-        news: {},
-        content: [],
-        regular_expresion: "",
-        recommend: [],
-        voice: ''
+        recommend: []
       }
     },
     async mounted(){
       await axios
-        .get(process.env.VUE_APP_API + "/api/summarize", {params: { "media": this.site_dict[this.site], "url": this.titleUrl} })
+        .get(process.env.VUE_APP_API + "/api/recommend_list", {params: { "news_url": this.titleUrl} })
         .then(response => {
           console.log(response.data)
-          this.manuscript.push("タイトル、" + this.title)
-          this.news = response.data
-          this.manuscript.push("要約文章")
-          for(var index in response.data.summary) {
-            this.manuscript.push(response.data.summary[index])
+          this.data = response.data
+          this.manuscript.push('オススメの関連ニュースは、')
+          var keys = Object.keys(response.data.recommend)
+          for (const [index, key] of keys.entries()) {
+            this.manuscript.push(String(index + 1) + "番、" + key)
+            this.recommend.push(String(index + 1) + "番、" + key)
           }
-          this.manuscript.push("何か気になった単語はありましたか？。オススメの関連ニュースを読みますか？。回答は、単語を調べる、関連ニュースを読むのどちらかでお願いします。")
-          this.regular_expresion = new RegExp('(' + response.data.ne_list.join('|') + ')', 'i');
+          this.manuscript.push("です。")
         }).catch(error => {
           console.log(error)
-      })
-
-      for(var row in this.news.summary){
-        this.content.push( this.news.summary[row].split(this.regular_expresion) )
-      }
-
-      await this.getVoice().then(response => {
-        this.voice = response[57]
       })
 
       const recognition = new window.webkitSpeechRecognition()
@@ -106,67 +89,44 @@
         if (event.results.length > 0) {
           this.text = event.results[0][0].transcript;
         }
-        this.recognition.stop()
+        // this.recognition.stop()
       };
-      
+      // recognition.start()
       this.isLoading = false
-      await this.startTalk()
-      recognition.start()
     },
     methods:{
-      getVoice(){
-        let intervalId;
-        return new Promise((resolve) => {
-          setInterval(() =>{
-            if(this.speech.getVoices().length > 0){
-              resolve(this.speech.getVoices())
-              clearInterval(intervalId)
-            }
-          }, 10)
-        })
-      },
       sleep(waitMsec) {
         window.setTimeout(() => {},waitMsec)
-      },
-      calcHot(word){
-        if(this.news.ne_list.indexOf(word) !== -1){
-          if(this.news.trends[word] > 500){
-            return ['large_word']
-          }else if(this.news.trends[word] > 300){
-            return ['midle_word']
-          }else if(this.news.trends[word] > 100){
-            return ['small_word']
-          }
-          
-        }
-        return []
       },
       async startSpeech() {
         await this.recognition.start()
       },
-      startTalk() {
+      startTalk: function() {
         for(var index in this.manuscript){
-          let welcome = new SpeechSynthesisUtterance(this.manuscript[index]);
+          let welcome = new SpeechSynthesisUtterance();
           welcome.lang = 'ja-JP';
           welcome.rate = 1.3
-          welcome.voice = this.voice
-          this.speech.speak(welcome)
-
-          this.sleep(100)
+          welcome.text = this.manuscript[index];
+          speechSynthesis.speak(welcome);
+          this.sleep(1)
         }
 
       },
     },
     watch:{
       text(val){
-        if (this.text.match(/関連ニュース/)) {
-          this.$router.push('./recommend_list')
+        if(val == "サンバ"){
+          val = "3番"
         }
-        else if(this.text.match(/単語/)){
-          this.$router.push('./wiki')
+        const val_list = val.split('番')
+        if(val_list.length == 2){
+          var num = this.Kan2Num(val_list[0])
+          console.log(num)
+          localStorage.newsTitle = this.newsList[num - 1]
+          localStorage.newsUrl = this.data[this.newsList[num -1]]['url']
+          localStorage.newsFee = this.data[this.newsList[num -1]]['fee']
+          this.$router.push('./news')
         }else{
-          this.speech.cancel()
-
           let u = new SpeechSynthesisUtterance();
           u.lang = 'ja-JP';
           u.rate = 1.3
@@ -174,7 +134,6 @@
           speechSynthesis.speak(u);
           this.startSpeech()
         } 
-        console.log(val)
       }
     }
   }
@@ -206,13 +165,6 @@
 
 .small_word{
   font-size: 1.3em !important;
-}
-
-.regnitional-btn{
-  height: 100px !important;
-  min-width: 94px !important;
-  font-size: 3em !important;
-  padding: 0.5em !important;
 }
 
 .v-btn__content{

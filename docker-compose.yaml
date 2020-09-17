@@ -32,7 +32,6 @@ services:
     privileged: true
     depends_on:
       - news-db
-      - wiki-db
     environment:
       - DB_news_NAME=news
       - DB_wiki_NAME=wiki

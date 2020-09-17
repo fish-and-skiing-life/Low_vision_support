@@ -8,8 +8,6 @@
         <p class="speak mt-10">読みたいニュースサイトを選んでください。</p>
         <p class="speak ">ニュースサイトは、ヤフーニュース、朝日新聞、読売新聞、日経新聞を利用できます。</p>
         <v-btn x-large color="primary" @click="startSpeech">{{ recognitionText }}</v-btn><br>
-        <button @click="startTalk" class='read'>音声読み上げ</button>
-        <p>{{ text }}</p>
       </v-col>
       
     </v-row>
@@ -18,17 +16,22 @@
 
 <script>
   export default {
-    name: 'HelloWorld',
 
     data(){
       return {
+        speech: window.speechSynthesis,
         recognition : "",
         recognitionText: "音声入力開始",
         text: "",
         show: false,
+        intervalID: ''
       }
     },
     async mounted(){
+      await this.getVoice().then(response => {
+        this.voice = response[57]
+      })
+
       const recognition = new window.webkitSpeechRecognition()
       recognition.lang = "ja-JP";
       recognition.continuous = true;
@@ -45,34 +48,45 @@
         }
         // this.recognition.stop()
       };
+      await this.startTalk()
       recognition.start()
+
     },
     methods:{
+      getVoice(){
+        let intervalId;
+        return new Promise((resolve) => {
+          setInterval(() =>{
+            if(this.speech.getVoices().length > 0){
+              resolve(this.speech.getVoices())
+              clearInterval(intervalId)
+            }
+          }, 10)
+        })
+      },
       sleep(waitMsec) {
         window.setTimeout(() => {},waitMsec)
       },
       async startSpeech() {
         await this.recognition.start()
       },
-      startTalk: function() {
+      startTalk(){
         let welcome = new SpeechSynthesisUtterance();
         welcome.lang = 'ja-JP';
         welcome.rate = 1.3
         welcome.text = 'ようこそ! low vision webアプリケーションへ。';
-        speechSynthesis.speak(welcome);
-        this.sleep(1)
+        this.speech.speak(welcome);
         let news = new SpeechSynthesisUtterance();
         news.lang = 'ja-JP';
         news.rate = 1.3
         news.text = '読みたいニュースサイトを選んでください。';
-        speechSynthesis.speak(news);
+        this.speech.speak(news);
 
-        this.sleep(1)
         let u = new SpeechSynthesisUtterance();
         u.lang = 'ja-JP';
         u.rate = 1.3
         u.text = 'ニュースサイトは、ヤフーニュース、朝日新聞、読売新聞、日経新聞を利用できます。';
-        speechSynthesis.speak(u);
+        this.speech.speak(u);
 
       },
     },
@@ -95,8 +109,10 @@
         }
 
         if( exist){
+          this.speech.cancel()
           this.$router.push('./category')
         }else{
+          this.speech.cancel()
           let u = new SpeechSynthesisUtterance();
           u.lang = 'ja-JP';
           u.rate = 1.3
@@ -104,7 +120,7 @@
           speechSynthesis.speak(u);
         }
         
-      }
+      },
     }
   }
 </script>
