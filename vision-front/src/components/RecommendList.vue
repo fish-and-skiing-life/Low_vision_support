@@ -92,6 +92,8 @@
         // this.recognition.stop()
       };
       // recognition.start()
+      // await this.startTalk()
+
       this.isLoading = false
     },
     methods:{
@@ -125,6 +127,7 @@
           localStorage.newsTitle = this.newsList[num - 1]
           localStorage.newsUrl = this.data[this.newsList[num -1]]['url']
           localStorage.newsFee = this.data[this.newsList[num -1]]['fee']
+          localStorage.mode = 'recommend'
           this.$router.push('./news')
         }else{
           let u = new SpeechSynthesisUtterance();

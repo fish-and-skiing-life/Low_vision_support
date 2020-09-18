@@ -177,6 +177,7 @@
           localStorage.newsTitle = this.newsList[num - 1]
           localStorage.newsUrl = this.data.article_list[this.newsList[num -1]]['url']
           localStorage.newsFee = this.data.article_list[this.newsList[num -1]]['fee']
+          localStorage.mode = 'news'
           this.$router.push('./news')
         }else{
           this.speech.cancel()
