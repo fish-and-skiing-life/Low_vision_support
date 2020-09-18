@@ -1,3 +1,4 @@
+import datetime
 import spacy
 
 from ..models import Trend, Article

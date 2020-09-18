@@ -1,10 +1,7 @@
-import datetime
 import itertools
 
 from rest_framework.response import Response
 from rest_framework import views
-import spacy
-#import pandas as pd
 from pytrends.request import TrendReq
 
 from webapi.lib.summarizer import LexRank
