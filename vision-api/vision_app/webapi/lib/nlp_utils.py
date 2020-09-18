@@ -60,3 +60,8 @@ def get_trend(ne_list):
         search_dict.update(data.apply(lambda col: col.sum()).to_dict())
 
     return search_dict
+
+
+
+if __name__ == "__main__":
+    calcArticleVector()
