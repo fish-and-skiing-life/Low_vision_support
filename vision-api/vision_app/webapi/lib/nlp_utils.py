@@ -1,5 +1,6 @@
 import datetime
 import spacy
+from pytrends.request import TrendReq
 
 from ..models import Trend, Article
 
