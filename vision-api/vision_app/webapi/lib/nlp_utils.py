@@ -2,27 +2,25 @@ import datetime
 import spacy
 from pytrends.request import TrendReq
 
-from ..models import Trend, Article
+from ..models import Trend, Article, Named_entity
 
 def calcArticleVector():
-    data = Article.objects.filter(vector = None)
-    print(data)
+    data = Article.objects.filter(vector = 0.0 )
+    is_success = True
+    try:
+        for article in data:
+            print(article.vector)
+            ne_list = extract_named(article.content)
+            for ne in ne_list:
+                named = Named_entity(url = article.row, word = ne, vector = 0.0)
+                trend = Trend(word = ne, score = 0)
+                # named.save()
+                # trend.save()
+    except Exception as e:
+        print(e)
+        is_success = False
 
-    for article in data:
-        print(article.vector)
-        ne_list = extract_named(article['content'])
-
-
-    # # summarization
-    # model = LexRank()
-    # summary_list = model.summarize(body)
-    # res = {'summary': summary_list, 'title': title}
-    # ne_list = extract_named(summary_list)
-    # res['ne_list'] = ne_list
-
-    # # trends
-    # res['trends'] = get_trend(ne_list)
-    # return res
+    return is_success
 
 def summarize(title, body ):
     # summarization
@@ -51,8 +49,8 @@ def get_trend(ne_list):
     dt_now = datetime.datetime.now()
     start_frame = (dt_now - datetime.timedelta(weeks=2)).strftime('%Y-%m-%d')
     end_frame = dt_now.strftime('%Y-%m-%d')
-    # pytrend = TrendReq(hl='jp-JP', tz=-540, proxies=['http://proxy.nagaokaut.ac.jp:8080'])
-    pytrend = TrendReq(hl='jp-JP', tz=-540)
+    pytrend = TrendReq(hl='jp-JP', tz=-540, proxies=['http://proxy.nagaokaut.ac.jp:8080'])
+    # pytrend = TrendReq(hl='jp-JP', tz=-540)
 
     for num in range(0, len(ne_list),5):
         pytrend.build_payload(ne_list[num : num+4], cat=0, timeframe=f'{start_frame} {end_frame}', geo='JP')
