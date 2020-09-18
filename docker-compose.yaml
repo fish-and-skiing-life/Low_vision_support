@@ -42,6 +42,8 @@ services:
 
   news-db:
     build: ./news_db
+    image: inatetsu/news-db
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
     volumes:
       - ./news_db/data:/var/lib/mysql
       - ./news_db/conf:/etc/mysql/conf.d
