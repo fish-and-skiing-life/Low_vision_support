@@ -13,13 +13,7 @@ class PositionRank:
         stop_words = self._load_stopwords()
         nltk.corpus.stopwords.words = lambda lang : stop_words
 
-    def _load_stopwords(self):
-        with open('../res/stopwords.txt') as f:
-            stopwords = f.read().split()
-
-        return stopwords
-
-    def extract(self, text, topn=10):
+    def extract(self, text, topn=10, is_join_words=True):
         """テキストからキーフレーズをtopn個抽出する．
 
         Parameters
@@ -38,5 +32,28 @@ class PositionRank:
         extractor.load_document(text, language='ja_ginza', normalization=None)
         extractor.candidate_selection(pos={'NOUN', 'PROPN', 'ADJ'})
         extractor.candidate_weighting(window=3)
-        
-        return extractor.get_n_best(n=topn)
+        keyphrases = extractor.get_n_best(n=topn)
+
+        return self._postprocessing(keyphrases, is_join_words)
+
+    def _load_stopwords(self):
+        with open('../res/stopwords.txt') as f:
+            stopwords = f.read().split()
+
+        return stopwords
+
+    def _postprocessing(self, keyphrases, is_join_words=True):
+        _keyphrases = keyphrases.copy()
+
+        if is_join_words:
+            _keyphrases = self._join_words(_keyphrases)
+
+        _keyphrases = self._without_score(_keyphrases)
+
+        return _keyphrases
+
+    def _without_score(self, keyphrases):
+        return [keyphrase for keyphrase, _ in keyphrases]
+
+    def _join_words(self, keyphrases):
+        return [(''.join(keyphrase.split()), score) for keyphrase, score in keyphrases]
