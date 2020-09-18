@@ -1,15 +1,15 @@
 import datetime
+import itertools
 
 from rest_framework.response import Response
 from rest_framework import views
 import spacy
-import pandas as pd
+#import pandas as pd
 from pytrends.request import TrendReq
 
 from webapi.lib.summarizer import LexRank
 from webapi.lib.crawling import Crawling
-
-from .models import Wiki
+from .models import Wiki, Trend, Article
 
 
 def summariz(title, body ):
@@ -39,7 +39,7 @@ def get_trend(ne_list):
     dt_now = datetime.datetime.now()
     start_frame = (dt_now - datetime.timedelta(weeks=2)).strftime('%Y-%m-%d')
     end_frame = dt_now.strftime('%Y-%m-%d')
-    pytrend = TrendReq(hl='jp-JP', tz=-540)
+    pytrend = TrendReq(hl='jp-JP', tz=-540, proxies=['http://proxy.nagaokaut.ac.jp:8080'])
 
     for num in range(0, len(ne_list),5):
         pytrend.build_payload(ne_list[num : num+4], cat=0, timeframe=f'{start_frame} {end_frame}', geo='JP')
@@ -88,6 +88,8 @@ class ArticleList(views.APIView):
         ne_list = []
         crawler = Crawling()
         article_list = crawler.get_article_list(int(media), url)
+        article_list = dict(itertools.islice(article_list.items(), 10))
+        
         ne_list = extract_named(article_list)
         res = {'article_list': article_list, 'ne_list': ne_list, 'trends': get_trend(ne_list) } 
         return Response(res)
@@ -118,12 +120,14 @@ class Recommend(views.APIView):
 
         return Response(res)
 
-class Wiki(views.APIView):
+class Wikipedia(views.APIView):
     def get(self, request):
-        word = request.GET.get('word')
-        wiki = Wiki.objects.filter(title = word)
+        words = request.GET.get('word')
+        hoge = Article.objects.filter(title= "陸上イージス代替策、「洋上」で検討　専用艦新造案も")
+        print(hoge)
+        wiki = Wiki.objects.filter(title__contains= 'ドラムマシン')
         print(wiki)
-        res = {'word': word,
+        res = {'word': words,
                 "summary": 'summary'
                    
                 }
