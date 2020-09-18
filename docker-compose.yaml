@@ -12,7 +12,7 @@ services:
     stdin_open: true
     privileged: true
     tty: true
-    # command: npm run serve 
+    command: npm run serve 
     environment:
       VUE_APP_API: http://localhost:8000
 
@@ -41,9 +41,12 @@ services:
       - DB_news_HOST=news-db
 
   news-db:
-    build: ./news_db
+    # build: ./news_db
+    image: inatetsu/news-db
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
     volumes:
       - ./news_db/data:/var/lib/mysql
+      - ./news_db/data:/var/lib/mysql-files
       - ./news_db/conf:/etc/mysql/conf.d
       - ./news_db/init:/docker-entrypoint-initdb.d/
     ports:
