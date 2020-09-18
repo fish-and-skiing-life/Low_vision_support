@@ -2,7 +2,6 @@ import itertools
 
 from rest_framework.response import Response
 from rest_framework import views
-from pytrends.request import TrendReq
 
 from webapi.lib.summarizer import LexRank
 from webapi.lib.crawling import Crawling
