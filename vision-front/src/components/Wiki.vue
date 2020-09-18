@@ -103,15 +103,24 @@
     },
     watch:{
       text(val){
-        axios
-          .get(process.env.VUE_APP_API + "/api/wiki", {params: { "word": val} })
-          .then(response => {
-            this.word = val
-            this.data = response.data
-            this.sumamry = response.data.summary
-          }).catch(error => {
-            console.log(error)
-        })
+        if (this.text.match(/関連ニュース/)) {
+          this.speech.cancel()
+          this.$router.push('./recommend_list')
+        }
+        else if(this.text.match(/単語/)){
+          this.speech.cancel()
+          this.$router.push('./wiki')
+        }else{
+          axios
+            .get(process.env.VUE_APP_API + "/api/wiki", {params: { "word": val} })
+            .then(response => {
+              this.word = val
+              this.data = response.data
+              this.sumamry = response.data.summary
+            }).catch(error => {
+              console.log(error)
+          })
+        }
       }
     }
   }

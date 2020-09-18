@@ -26,4 +26,3 @@ RUN { \
     echo 'default-character-set=utf8mb4'; \
 } > /etc/mysql/conf.d/charset.cnf
 
-CMD ["mysqld"]

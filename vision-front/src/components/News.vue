@@ -58,6 +58,7 @@
         title: localStorage.getItem("newsTitle"),
         titleUrl: localStorage.getItem("newsUrl"),
         fee: localStorage.getItem("newsFee"),
+        mode: localStorage.getItem("mode"),
         manuscript: [],
         show: false,
         news: {},
@@ -160,9 +161,11 @@
     watch:{
       text(val){
         if (this.text.match(/関連ニュース/)) {
+          this.speech.cancel()
           this.$router.push('./recommend_list')
         }
         else if(this.text.match(/単語/)){
+          this.speech.cancel()
           this.$router.push('./wiki')
         }else{
           this.speech.cancel()
@@ -174,7 +177,6 @@
           speechSynthesis.speak(u);
           this.startSpeech()
         } 
-        console.log(val)
       }
     }
   }

@@ -9,45 +9,8 @@ from pytrends.request import TrendReq
 
 from webapi.lib.summarizer import LexRank
 from webapi.lib.crawling import Crawling
+import webapi.lib.nlp_utils as nlp_utils
 from .models import Wiki, Trend, Article
-
-
-def summariz(title, body ):
-    # summarization
-    model = LexRank()
-    summary_list = model.summarize(body)
-    res = {'summary': summary_list, 'title': title}
-    ne_list = extract_named(summary_list)
-    res['ne_list'] = ne_list
-
-    # trends
-    res['trends'] = get_trend(ne_list)
-    return res
-
-def extract_named(doc_list):
-    nlp = spacy.load('ja_ginza')
-    ne_list = []
-    for i, doc in enumerate(doc_list):
-        doc_split = nlp(str(doc))
-        for ent in doc_split.ents:
-            ne_list.append(str(ent.text))
-
-    return list(set(ne_list))
-
-def get_trend(ne_list):
-    search_dict = {}
-    dt_now = datetime.datetime.now()
-    start_frame = (dt_now - datetime.timedelta(weeks=2)).strftime('%Y-%m-%d')
-    end_frame = dt_now.strftime('%Y-%m-%d')
-    pytrend = TrendReq(hl='jp-JP', tz=-540, proxies=['http://proxy.nagaokaut.ac.jp:8080'])
-
-    for num in range(0, len(ne_list),5):
-        pytrend.build_payload(ne_list[num : num+4], cat=0, timeframe=f'{start_frame} {end_frame}', geo='JP')
-
-        data = pytrend.interest_over_time().drop(['isPartial'], axis=1)
-        search_dict.update(data.apply(lambda col: col.sum()).to_dict())
-
-    return search_dict
 
 
 class ArticleSummarization(views.APIView):
@@ -67,9 +30,7 @@ class ArticleSummarization(views.APIView):
         print(article)
         # summarization
 
-        summariz(article['title'], article['body'])
-
-        return Response(summariz(article['title'], article['body']))
+        return Response(nlp_utils.summarize(article['title'], article['body']))
 
 class ArticleCategory(views.APIView):
     def get(self, request):
@@ -90,8 +51,8 @@ class ArticleList(views.APIView):
         article_list = crawler.get_article_list(int(media), url)
         article_list = dict(itertools.islice(article_list.items(), 10))
         
-        ne_list = extract_named(article_list)
-        res = {'article_list': article_list, 'ne_list': ne_list, 'trends': get_trend(ne_list) } 
+        ne_list = nlp_utils.extract_named(article_list)
+        res = {'article_list': article_list, 'ne_list': ne_list, 'trends': nlp_utils.get_trend(ne_list) } 
         return Response(res)
 
 class RecommendList(views.APIView):
