@@ -10,6 +10,7 @@ numpy
 scipy
 spacy
 ginza
+nltk
 git+https://github.com/boudinfl/pke.git
 mysqlclient
 pandas
