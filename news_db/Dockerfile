@@ -25,3 +25,4 @@ RUN { \
     echo '[mysqldump]'; \
     echo 'default-character-set=utf8mb4'; \
 } > /etc/mysql/conf.d/charset.cnf
+

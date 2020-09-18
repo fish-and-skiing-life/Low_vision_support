@@ -19,11 +19,11 @@ class Crawling:
                         ]
 
         self.base = [ "https://news.yahoo.co.jp","https://www.asahi.com", "","https://www.nikkei.com", "https://news.nicovideo.jp"]
-
+        self.proxies_dic = {"http": "http://proxy.nagaokaut.ac.jp:8080","https": "http://proxy.nagaokaut.ac.jp:8080"}
 
     def get_category(self, site_id):
         category = {}
-        html = requests.get(self.url_dict[site_id]['url'])
+        html = requests.get(self.url_dict[site_id]['url'], proxies=self.proxies_dic)
         soup = BeautifulSoup(html.content, 'html.parser')
         li_list = []
         if(site_id == 1):
@@ -75,7 +75,7 @@ class Crawling:
 
     def get_article_list(self,site_id ,category_url):
         news_list = {}
-        html = requests.get(category_url)
+        html = requests.get(category_url, proxies=self.proxies_dic)
         soup = BeautifulSoup(html.content, 'html.parser')
         if site_id == 1:   
             soup = soup.select("ul.List li")
@@ -117,12 +117,12 @@ class Crawling:
         return news_list
 
     def get_article(self,site_id ,category_url):
-        html = requests.get(category_url)
+        html = requests.get(category_url, proxies=self.proxies_dic)
         soup = BeautifulSoup(html.content, 'html.parser')
         article_body= ""
         if site_id == 0:
             soup = soup.find(class_="pickupMain_detailLink")
-            html = requests.get(soup.find('a').get('href'))
+            html = requests.get(soup.find('a').get('href'), proxies=self.proxies_dic)
             soup = BeautifulSoup(html.content, 'html.parser')
             article = soup.find(id="uamods")
             title = article.select('h1')[0].get_text()
