@@ -22,6 +22,8 @@ class PositionRank:
             抽出対象のテキスト
         topn : int, default 10
             抽出するキーフレーズの件数
+        is_join_words : bool, default True
+            キーフレーズの単語を結合するか否か
 
         Returns
         -------
