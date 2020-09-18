@@ -32,6 +32,8 @@ class ArticleCategory(views.APIView):
     def get(self, request):
         media = request.GET.get('media')
 
+        nlp_utils.calcArticleVector()
+
         crawler = Crawling()
         article_category = crawler.get_category(int(media))
 
