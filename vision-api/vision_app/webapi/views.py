@@ -36,7 +36,6 @@ class ArticleCategory(views.APIView):
 
         crawler = Crawling()
         article_category = crawler.get_category(int(media))
-        nlp_utils.calcArticleVector()
 
         return Response(article_category)
 
@@ -93,3 +92,9 @@ class Wikipedia(views.APIView):
                 }
 
         return Response(res)
+
+class CalcDb(views.APIView):
+    def get(self, request):
+        
+        result = nlp_utils.calcArticleVector()
+        return Response({'result': result})
