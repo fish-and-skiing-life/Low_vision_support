@@ -85,6 +85,7 @@
           this.manuscript.push("です。")
           this.regular_expresion = new RegExp('(' + response.data.ne_list.join('|') + ')', 'i');
         }).catch(error => {
+          this.manuscript.push('エラーが起きました。ページをリロードして、やり直してください。')
           console.error(error)
       })
 
@@ -173,7 +174,6 @@
         const val_list = val.split('番')
         if(val_list.length == 2){
           var num = this.Kan2Num(val_list[0])
-          console.log(num)
           localStorage.newsTitle = this.newsList[num - 1]
           localStorage.newsUrl = this.data.article_list[this.newsList[num -1]]['url']
           localStorage.newsFee = this.data.article_list[this.newsList[num -1]]['fee']

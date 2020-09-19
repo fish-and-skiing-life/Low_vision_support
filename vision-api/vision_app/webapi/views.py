@@ -32,8 +32,6 @@ class ArticleCategory(views.APIView):
     def get(self, request):
         media = request.GET.get('media')
 
-        nlp_utils.calcArticleVector()
-
         crawler = Crawling()
         article_category = crawler.get_category(int(media))
 
@@ -49,7 +47,7 @@ class ArticleList(views.APIView):
         article_list = crawler.get_article_list(int(media), url)
         article_list = dict(itertools.islice(article_list.items(), 10))
         
-        ne_list = nlp_utils.extract_named(article_list)
+        ne_list = nlp_utils.extract_keyword(article_list)
         res = {'article_list': article_list, 'ne_list': ne_list, 'trends': nlp_utils.get_trend(ne_list) } 
         return Response(res)
 
@@ -96,5 +94,5 @@ class Wikipedia(views.APIView):
 class CalcDb(views.APIView):
     def get(self, request):
         
-        result = nlp_utils.calcArticleVector()
+        result = nlp_utils.get_trend_score('ドコモ口座')
         return Response({'result': result})
