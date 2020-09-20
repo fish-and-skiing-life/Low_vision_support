@@ -63,8 +63,8 @@
         page: 0,
         manuscript: [],
         content: [],
+        neList: [],
         regular_expresion: "",
-        show: false
       }
     },
     async mounted(){
@@ -72,33 +72,46 @@
         .get(process.env.VUE_APP_API + "/api/article_list", {params: { "media": this.site_dict[this.site], "category_url": this.category_url} })
         .then(response => {
           console.log(response.data)
-          this.manuscript.push('記事の選択は1番のように、記事の番号で選択してください。')
-          this.manuscript.push('現在、' + this.site + 'の' + this.category + 'で読める記事のタイトルは、')
-          this.data = response.data
           this.newsList = Object.keys(response.data.article_list)
-          for (const [index, key] of this.newsList.entries()) {
-            if(index < 5){
-              this.manuscript.push(String(index + 1) + "番、" + key)
+          if( this.newsList.length > 0 ){
+            this.manuscript.push('記事の選択は1番のように、記事の番号で選択してください。')
+            this.manuscript.push('現在、' + this.site + 'の' + this.category + 'で読める記事のタイトルは、')
+            this.data = response.data
+            this.newsList = Object.keys(response.data.article_list)
+            for (const [index, key] of this.newsList.entries()) {
+              if(index < 5){
+                this.manuscript.push(String(index + 1) + "番、" + key)
 
+              }
             }
+            this.manuscript.push("です。")
+            for( var index in response.data.ne_list){
+              this.neList.push(response.data.ne_list[index].replace(/\s+/g, ''))
+            }
+            this.regular_expresion = new RegExp('(' + this.neList.join('|') + ')', 'i');
+          }else{
+            this.manuscript.push('ニュース記事一覧のクローリングに失敗しました。')
+            this.manuscript.push('他のニュース媒体を選択するか、違うカテゴリーを選択してください。')
+            this.manuscript.push('他のニュース媒体を選択するする場合は、ニュース媒体を選択すると発声してください')
+            this.manuscript.push('違うカテゴリーを選択する場合は、カテゴリーの変更と発声してください')
           }
-          this.manuscript.push("です。")
-          this.regular_expresion = new RegExp('(' + response.data.ne_list.join('|') + ')', 'i');
+          
         }).catch(error => {
           this.manuscript.push('エラーが起きました。ページをリロードして、やり直してください。')
+          this.manuscript.push('リロードしてもエラーが起きる場合、他のニュース媒体を選択するか、違うカテゴリーを選択してください。')
+          this.manuscript.push('他のニュース媒体を選択するする場合は、ニュース媒体を選択すると発声してください')
+          this.manuscript.push('違うカテゴリーを選択する場合は、カテゴリーの変更と発声してください')
           console.error(error)
       })
 
       for(var row in this.newsList){
-        this.content.push( this.newsList[row].split(this.regular_expresion) )
+        this.content.push( this.newsList[row].replace(/\s+/g, '').split(this.regular_expresion) )
       }
 
-      console.log(this.content)
-
-      const recognition = new window.webkitSpeechRecognition()
-      recognition.lang = "ja-JP";
-      recognition.continuous = true;
-      this.recognition = recognition;
+      const speechRecognition = new window.webkitSpeechRecognition()
+      speechRecognition.lang = "ja-JP";
+      speechRecognition.continuous = true;
+      this.recognition = speechRecognition;
       this.recognition.onstart = () => {
         this.recognitionText = "音声入力中...";
       };
@@ -119,12 +132,17 @@
     },
     methods:{
       calcHot(word){
-        if(this.data.ne_list.indexOf(word) !== -1){
-          if(this.data.trends[word] > 500){
+        var index = this.neList.indexOf(word)
+
+        if( index !== -1){
+          var text = this.data.ne_list[index]
+          console.log(text)
+          console.log(this.data.trends[text])
+          if(this.data.trends[text] > 0.4){
             return ['large_word']
-          }else if(this.data.trends[word] > 300){
+          }else if(this.data.trends[text] > 0.1){
             return ['midle_word']
-          }else if(this.data.trends[word] > 100){
+          }else if(this.data.trends[text] > 0.07){
             return ['small_word']
           }
           
@@ -179,7 +197,16 @@
           localStorage.newsFee = this.data.article_list[this.newsList[num -1]]['fee']
           localStorage.mode = 'news'
           this.$router.push('./news')
-        }else{
+        }
+        else if(val.match(/カテゴリーの変更/)){
+          this.speech.cancel()
+          this.$router.push('./category')
+        }
+        else if(val.match(/ニュース媒体を選択/)){
+          this.speech.cancel()
+          this.$router.push('./')
+        }
+        else{
           this.speech.cancel()
 
           let u = new SpeechSynthesisUtterance();

@@ -22,9 +22,7 @@
         speech: window.speechSynthesis,
         recognition : "",
         recognitionText: "音声入力開始",
-        text: "",
-        show: false,
-        intervalID: ''
+        text: ""
       }
     },
     async mounted(){
@@ -32,10 +30,10 @@
         this.voice = response[57]
       })
 
-      const recognition = new window.webkitSpeechRecognition()
-      recognition.lang = "ja-JP";
-      recognition.continuous = true;
-      this.recognition = recognition;
+      const speechRecognition = new window.webkitSpeechRecognition()
+      speechRecognition.lang = "ja-JP";
+      speechRecognition.continuous = true;
+      this.recognition = speechRecognition;
       this.recognition.onstart = () => {
         this.recognitionText = "音声入力中...";
       };
@@ -49,7 +47,7 @@
         // this.recognition.stop()
       };
       await this.startTalk()
-      recognition.start()
+      this.recognition.start()
 
     },
     methods:{

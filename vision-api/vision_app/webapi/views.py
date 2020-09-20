@@ -1,10 +1,12 @@
 import itertools
-
+import os
 from rest_framework.response import Response
 from rest_framework import views
 
-from webapi.lib.summarizer import LexRank
+
 from webapi.lib.crawling import Crawling
+from wikipedia2vec import Wikipedia2Vec
+from django.conf import settings
 import webapi.lib.nlp_utils as nlp_utils
 from .models import Wiki, Trend, Article
 
@@ -45,7 +47,7 @@ class ArticleList(views.APIView):
         ne_list = []
         crawler = Crawling()
         article_list = crawler.get_article_list(int(media), url)
-        article_list = dict(itertools.islice(article_list.items(), 10))
+        article_list = dict(itertools.islice(article_list.items(), 5))
         
         ne_list = nlp_utils.extract_keyword(article_list)
         res = {'article_list': article_list, 'ne_list': ne_list, 'trends': nlp_utils.get_trend(ne_list) } 
@@ -79,16 +81,24 @@ class Recommend(views.APIView):
 
 class Wikipedia(views.APIView):
     def get(self, request):
+        file_path = os.path.join(
+            settings.BASE_DIR, 'webapi/modeled/jawiki_20180420_100d.pkl'
+            )
         words = request.GET.get('word')
-        hoge = Article.objects.filter(title= "陸上イージス代替策、「洋上」で検討　専用艦新造案も")
-        print(hoge)
-        wiki = Wiki.objects.filter(title__contains= 'ドラムマシン')
-        print(wiki)
-        res = {'word': words,
-                "summary": 'summary'
-                   
-                }
+        wiki2vec = Wikipedia2Vec.load(file_path)
+        similar_list = wiki2vec.most_similar(wiki2vec.get_entity(words), 5)
+        result = ''
+        for row in similar_list:
+            if(row[0].__class__.__name__ == 'Entity'):
+                result = row[0].title
+                break
 
+        wiki = Wiki.objects.filter(title = result)
+
+        if len(wiki) == 0:
+            res = {'title': 'error', 'summary': ['error']}
+        else:
+            res = nlp_utils.summarize(wiki.title, wiki.abst)
         return Response(res)
 
 class CalcDb(views.APIView):

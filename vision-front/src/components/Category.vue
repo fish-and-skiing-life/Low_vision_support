@@ -27,8 +27,7 @@
         site: localStorage.getItem("site"),
         category_dict: {},
         manuscript: [],
-        categorys: "",
-        show: false,
+        categorys: ""
       }
     },
     async mounted(){
@@ -49,10 +48,10 @@
         }).catch(error => {
           console.log('this is errior',error)
       })
-      const recognition = new window.webkitSpeechRecognition()
-      recognition.lang = "ja-JP";
-      recognition.continuous = true;
-      this.recognition = recognition;
+      const speechRecognition = new window.webkitSpeechRecognition()
+      speechRecognition.lang = "ja-JP";
+      speechRecognition.continuous = true;
+      this.recognition = speechRecognition;
       this.recognition.onstart = () => {
         this.recognitionText = "音声入力中...";
       };
@@ -66,7 +65,7 @@
         this.recognition.stop()
       };
       await this.startTalk()
-      recognition.start()
+      this.recognition.start()
     },
     methods:{
       sleep(waitMsec) {

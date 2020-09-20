@@ -72,13 +72,14 @@
           }
           this.manuscript.push("です。")
         }).catch(error => {
+          this.manuscript.push('エラーが起きました。ページをリロードして、やり直してください。')
           console.log(error)
       })
 
-      const recognition = new window.webkitSpeechRecognition()
-      recognition.lang = "ja-JP";
-      recognition.continuous = true;
-      this.recognition = recognition;
+      const speechRecognition = new window.webkitSpeechRecognition()
+      speechRecognition.lang = "ja-JP";
+      speechRecognition.continuous = true;
+      this.recognition = speechRecognition;
       this.recognition.onstart = () => {
         this.recognitionText = "音声入力中...";
       };

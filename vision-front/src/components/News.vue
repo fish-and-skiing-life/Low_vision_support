@@ -53,50 +53,67 @@
         recognitionText: "音声入力開始",
         text: "",
         site_dict: {"ヤフーニュース":0, "朝日新聞":1, "読売新聞":2, "日経新聞":3},
-        abst: '明日は京都に行きたいと思ってます',
         site: localStorage.getItem("site"),
         title: localStorage.getItem("newsTitle"),
         titleUrl: localStorage.getItem("newsUrl"),
         fee: localStorage.getItem("newsFee"),
         mode: localStorage.getItem("mode"),
         manuscript: [],
-        show: false,
         news: {},
         content: [],
         regular_expresion: "",
         recommend: [],
+        neList: [],
         voice: ''
       }
     },
     async mounted(){
       await axios
-        .get(process.env.VUE_APP_API + "/api/summarize", {params: { "media": this.site_dict[this.site], "url": this.titleUrl} })
+        .get(process.env.VUE_APP_API + "/api/summarize", {params: { "media": this.site_dict[this.site], "url": this.titleUrl,'mode': this.mode} })
         .then(response => {
           console.log(response.data)
-          this.manuscript.push("タイトル、" + this.title)
-          this.news = response.data
-          this.manuscript.push("要約文章")
-          for(var index in response.data.summary) {
-            this.manuscript.push(response.data.summary[index])
+          if(response.data.summary.length > 0){
+            this.manuscript.push("タイトル、" + this.title)
+            this.news = response.data
+            this.manuscript.push("要約文章")
+            for(var index in response.data.summary) {
+              this.manuscript.push(response.data.summary[index])
+            }
+            this.manuscript.push("何か気になった単語はありましたか？。オススメの関連ニュースを読みますか？。回答は、単語を調べる、関連ニュースを読むのどちらかでお願いします。")
+
+            for( var ne_index in response.data.ne_list){
+              this.neList.push(response.data.ne_list[ne_index].replace(/\s+/g, ''))
+            }
+            this.regular_expresion = new RegExp('(' + response.data.ne_list.join('|') + ')', 'i');
+          }else{
+            this.manuscript.push('ニュース記事のクローリングに失敗しました。')
+            this.manuscript.push('他のニュース媒体を選択するか、違うカテゴリーを選択するか、違う記事を選択してください。')
+            this.manuscript.push('他のニュース媒体を選択するする場合は、ニュース媒体を選択すると発声してください')
+            this.manuscript.push('違うカテゴリーを選択する場合は、カテゴリーの変更と発声してください')
+            this.manuscript.push('違う記事を選択する場合は、記事の変更と発声してください')
           }
-          this.manuscript.push("何か気になった単語はありましたか？。オススメの関連ニュースを読みますか？。回答は、単語を調べる、関連ニュースを読むのどちらかでお願いします。")
-          this.regular_expresion = new RegExp('(' + response.data.ne_list.join('|') + ')', 'i');
+          
         }).catch(error => {
+          this.manuscript.push('エラーが起きました。ページをリロードして、やり直してください。')
+          this.manuscript.push('リロードしてもエラーが起きる場合、他のニュース媒体を選択するか、違うカテゴリーを選択するか、違う記事を選択してください。')
+          this.manuscript.push('他のニュース媒体を選択する場合は、ニュース媒体を選択すると発声してください')
+          this.manuscript.push('違うカテゴリーを選択する場合は、カテゴリーの変更と発声してください')
+          this.manuscript.push('違う記事を選択する場合は、記事の変更と発声してください')
           console.log(error)
       })
 
       for(var row in this.news.summary){
-        this.content.push( this.news.summary[row].split(this.regular_expresion) )
+        this.content.push( this.news.summary[row].replace(/\s+/g, '').split(this.regular_expresion) )
       }
 
       await this.getVoice().then(response => {
         this.voice = response[57]
       })
 
-      const recognition = new window.webkitSpeechRecognition()
-      recognition.lang = "ja-JP";
-      recognition.continuous = true;
-      this.recognition = recognition;
+      const speechRecognition = new window.webkitSpeechRecognition()
+      speechRecognition.lang = "ja-JP";
+      speechRecognition.continuous = true;
+      this.recognition = speechRecognition;
       this.recognition.onstart = () => {
         this.recognitionText = "音声入力中...";
       };
@@ -111,8 +128,8 @@
       };
       
       this.isLoading = false
-      await this.startTalk()
-      recognition.start()
+      // await this.startTalk()
+      // this.recognition.start()
     },
     methods:{
       getVoice(){
@@ -130,12 +147,15 @@
         window.setTimeout(() => {},waitMsec)
       },
       calcHot(word){
-        if(this.news.ne_list.indexOf(word) !== -1){
-          if(this.news.trends[word] > 500){
+        var index = this.neList.indexOf(word)
+        if(index !== -1){
+          var text = this.news.ne_list[index]
+
+          if(this.news.trends[text]  > 500){
             return ['large_word']
-          }else if(this.news.trends[word] > 300){
+          }else if(this.news.trends[text]  > 300){
             return ['midle_word']
-          }else if(this.news.trends[word] > 100){
+          }else if(this.news.trends[text]  > 100){
             return ['small_word']
           }
           
@@ -167,7 +187,20 @@
         else if(this.text.match(/単語/)){
           this.speech.cancel()
           this.$router.push('./wiki')
-        }else{
+        }
+        else if(val.match(/カテゴリーの変更/)){
+          this.speech.cancel()
+          this.$router.push('./category')
+        }
+        else if(val.match(/ニュース媒体/)){
+          this.speech.cancel()
+          this.$router.push('./')
+        }
+        else if(val.match(/記事の変更/)){
+          this.speech.cancel()
+          this.$router.push('./news-list')
+        }
+        else{
           this.speech.cancel()
 
           let u = new SpeechSynthesisUtterance();
