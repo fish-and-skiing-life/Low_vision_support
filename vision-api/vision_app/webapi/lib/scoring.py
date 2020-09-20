@@ -38,6 +38,8 @@ def calc_moving_average_convergence_divergence(x, recent_span=7):
 
 def calc_trend_score(x, recent_span=7):
     """GoogleTrendスコアから修正トレンドスコアを計算する．
+    スコア計算には移動平均収束拡散法(MACD)を利用．
+    MACDの値が負になる場合はスコアは0とする．
     スコアの値域は [0, 1]
 
     Parameters
@@ -52,4 +54,9 @@ def calc_trend_score(x, recent_span=7):
     float
         修正トレンドスコア
     """
-    return (100 + calc_moving_average_convergence_divergence(x, recent_span)) / 200
+    macd_score = calc_moving_average_convergence_divergence(x, recent_span)
+
+    if macd_score < 0:
+        return 0.0
+    
+    return macd_score / 100
