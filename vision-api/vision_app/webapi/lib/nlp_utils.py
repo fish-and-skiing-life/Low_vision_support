@@ -32,7 +32,7 @@ def calcArticleVector():
 
     return is_success
 
-def summarize(title, body ):
+def summarize(title, body, isTrend = True ):
     # summarization
     model = LexRank()
     summary_list = model.summarize(body)
@@ -41,7 +41,11 @@ def summarize(title, body ):
     res['ne_list'] = ne_list
 
     # trends
-    res['trends'] = get_trend(ne_list)
+    if( isTrend ):
+        res['trends'] = get_trend(ne_list)
+    else:
+        res['trends'] = ''
+    
     return res
 
 def extract_keyword(doc_list):

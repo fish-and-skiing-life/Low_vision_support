@@ -97,6 +97,7 @@
     },
     watch:{
       text(val){
+        console.log('sdfsdf')
         if (this.text.match(/関連ニュース/)) {
           this.speech.cancel()
           this.$router.push('./recommend_list')
