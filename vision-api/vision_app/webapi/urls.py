@@ -9,4 +9,5 @@ urlpatterns = [
     path('api/recommend', views.Recommend.as_view()),
     path('api/wiki', views.Wikipedia.as_view()),
     path('api/calcDb', views.CalcDb.as_view()),
+    path('api/insertwiki', views.InsertWiki.as_view()),
 ]

@@ -2,6 +2,9 @@ import requests
 from bs4 import BeautifulSoup
 
 class Crawling:
+    """
+        クローリング関係の
+    """
     def __init__(self):
         self.url_dict = [
                             {'url': "https://news.yahoo.co.jp/topics/domestic", 'class': "newsFeedTab_item"},
@@ -22,6 +25,18 @@ class Crawling:
         self.proxies_dic = {"http": "http://proxy.nagaokaut.ac.jp:8080","https": "http://proxy.nagaokaut.ac.jp:8080"}
 
     def get_category(self, site_id):
+        """記事媒体IDから、カテゴリーを返す関数
+
+            Parameters
+            ----------
+            site_id : int
+                記事媒体ID
+
+            Returns
+            -------
+            dict
+              {category name: list, url: string}
+        """
         category = {}
         html = requests.get(self.url_dict[site_id]['url'], proxies=self.proxies_dic)
         soup = BeautifulSoup(html.content, 'html.parser')
@@ -70,10 +85,23 @@ class Crawling:
                 except:
                     print('error')
 
-        print(category)
         return category
 
     def get_article_list(self,site_id ,category_url):
+        """カテゴリーから、記事一覧を取得し返す
+
+            Parameters
+            ----------
+            site_id : int
+                記事媒体ID
+            category_url : str
+                カテゴリーのURL
+
+            Returns
+            -------
+            dict
+              {title: str, url: str}
+        """
         news_list = {}
         html = requests.get(category_url, proxies=self.proxies_dic)
         soup = BeautifulSoup(html.content, 'html.parser')
@@ -113,11 +141,24 @@ class Crawling:
             except:
                 print(row)
         
-        print(news_list)
         return news_list
 
-    def get_article(self,site_id ,category_url):
-        html = requests.get(category_url, proxies=self.proxies_dic)
+    def get_article(self,site_id ,article_url):
+        """記事のクローリング
+
+            Parameters
+            ----------
+            site_id : int
+                記事媒体ID
+            article_url : str
+                記事のURL
+
+            Returns
+            -------
+            dict
+              {title: str, body: str}
+        """
+        html = requests.get(article_url, proxies=self.proxies_dic)
         soup = BeautifulSoup(html.content, 'html.parser')
         article_body= ""
         if site_id == 0:

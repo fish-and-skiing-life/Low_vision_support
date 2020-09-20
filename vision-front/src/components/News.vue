@@ -20,7 +20,6 @@
         <h1 class="title mt-10">{{title}}</h1>
 
         <p class="speak mt-10">要約文</p>
-        <!-- <p> {{ news }}</p> -->
         <p class="speak mt-10" v-for='row in content' :key="row">
           <span v-for='word in row' :key="word" :class='calcHot(word)'>
             {{ word}}

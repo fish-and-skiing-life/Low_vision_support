@@ -9,6 +9,7 @@ from wikipedia2vec import Wikipedia2Vec
 from django.conf import settings
 import webapi.lib.nlp_utils as nlp_utils
 from .models import Wiki, Trend, Article
+import pandas as pd
 
 
 class ArticleSummarization(views.APIView):
@@ -94,15 +95,31 @@ class Wikipedia(views.APIView):
                 break
 
         wiki = Wiki.objects.filter(title = result)
+        print(wiki)
 
         if len(wiki) == 0:
             res = {'title': 'error', 'summary': ['error']}
         else:
-            res = nlp_utils.summarize(wiki.title, wiki.abst)
+            res = nlp_utils.summarize(wiki[0].title, wiki[0].abst, False)
         return Response(res)
 
 class CalcDb(views.APIView):
     def get(self, request):
         
-        result = nlp_utils.get_trend_score('ドコモ口座')
+        result = nlp_utils.calcArticleVector()
         return Response({'result': result})
+
+class InsertWiki(views.APIView):
+    def get(self, request):
+        df = pd.read_csv('/myapp/vision_app/webapi/wiki_data.csv')
+        error = []
+        for i in range(len(df)):
+            wiki_data = Wiki(title=df.iloc[i, 1], abst=df.iloc[i, 2])
+            try:
+                wiki_data.save()
+            except:
+                error.append(df.iloc[i, 1])
+
+        print(error)
+        return Response({'result': 'OK'})
+
