@@ -103,6 +103,7 @@
     },
     watch:{
       text(val){
+        console.log('sdfsdf')
         if (this.text.match(/関連ニュース/)) {
           this.speech.cancel()
           this.$router.push('./recommend_list')
@@ -111,6 +112,7 @@
           this.speech.cancel()
           this.$router.push('./wiki')
         }else{
+          console.log(val)
           axios
             .get(process.env.VUE_APP_API + "/api/wiki", {params: { "word": val} })
             .then(response => {

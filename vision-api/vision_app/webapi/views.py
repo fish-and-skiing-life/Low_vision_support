@@ -7,6 +7,7 @@ from webapi.lib.summarizer import LexRank
 from webapi.lib.crawling import Crawling
 import webapi.lib.nlp_utils as nlp_utils
 from .models import Wiki, Trend, Article
+import pandas as pd
 
 
 class ArticleSummarization(views.APIView):
@@ -82,11 +83,10 @@ class Wikipedia(views.APIView):
         words = request.GET.get('word')
         hoge = Article.objects.filter(title= "陸上イージス代替策、「洋上」で検討　専用艦新造案も")
         print(hoge)
-        wiki = Wiki.objects.filter(title__contains= 'ドラムマシン')
+        wiki = Wiki.objects.filter(title__contains= words )
         print(wiki)
         res = {'word': words,
-                "summary": 'summary'
-                   
+                "summary": wiki.title
                 }
 
         return Response(res)
@@ -96,3 +96,18 @@ class CalcDb(views.APIView):
         
         result = nlp_utils.get_trend_score('ドコモ口座')
         return Response({'result': result})
+
+class InsertWiki(views.APIView):
+    def get(self, request):
+        df = pd.read_csv('/myapp/vision_app/webapi/wiki_data.csv')
+        error = []
+        for i in range(len(df)):
+            wiki_data = Wiki(title=df.iloc[i, 1], abst=df.iloc[i, 2])
+            try:
+                wiki_data.save()
+            except:
+                error.append(df.iloc[i, 1])
+
+        print(error)
+        return Response({'result': 'OK'})
+
