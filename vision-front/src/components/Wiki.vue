@@ -19,7 +19,6 @@
         
         <h1 class="title mt-10">気になった単語 : {{ word }} </h1>
         <p class="speak mt-10"> wikipedia 概要の要約 </p>
-        <!-- <p> {{ news }}</p> -->
         <p class="speak mt-10" v-for='row in summary' :key="row">{{ row }}</p>
 
         <v-btn x-large color="primary" @click="startSpeech">{{ recognitionText }}</v-btn><br>
@@ -70,7 +69,7 @@
         if (event.results.length > 0) {
           this.text = event.results[0][0].transcript;
         }
-        // this.recognition.stop()
+        this.recognition.stop()
       };
       // recognition.start()
       await this.startTalk()
@@ -97,7 +96,6 @@
     },
     watch:{
       text(val){
-        console.log('sdfsdf')
         if (this.text.match(/関連ニュース/)) {
           this.speech.cancel()
           this.$router.push('./recommend_list')

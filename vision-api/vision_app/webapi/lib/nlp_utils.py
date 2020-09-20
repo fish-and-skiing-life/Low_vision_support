@@ -1,6 +1,7 @@
 import datetime
 import spacy
 import itertools
+import time
 from pytrends.request import TrendReq
 from dateutil.relativedelta import relativedelta
 from webapi.lib.summarizer import LexRank
@@ -10,39 +11,47 @@ from ..models import Trend, Article, Named_entity
 import numpy as np
 
 def calcArticleVector():
+    """Articleテーブルのvectorが'''の値を全部取得し、vector計算する
+
+        Returns
+        -------
+        Boolian
+          成功か失敗か
+    """
     data = Article.objects.filter(vector = '' )
-    test = Article.objects.get(id=1)
-    print(test.vector)
-    print(test.vector == '')
     is_success = True
     position = PositionRank()
     vectorizer = GinzaVectorizer()
+    named_entity_query = []
+    trend_query = []
+    article_query = []
     try:
         for article in data:
             key_dict = {}
             trend_dict = {}
-            print(article.vector)
             key_list = position.extract(article.content)
             for keyword in key_list:
-                print(keyword)
                 vector = vectorizer.encode_phrase(keyword)
                 vector_str = str(vector.tolist())
-                print(vector_str)
                 named = Named_entity(url = article.url, word = keyword, vector = 0.0)
                 keyword_score = get_trend_score(keyword)
                 trend = Trend(word = keyword, score = keyword_score)
                 key_dict.setdefault(keyword, vector)
                 trend_dict.setdefault(keyword, keyword_score)
-                sleep(40)
-                # named.save()
-                # trend.save()
+                named_entity_query.append(named)
+                trend_query.append(trend)
+                time.sleep(40)
 
             article_vector = vectorizer.calc_weighted_article_vector(key_dict, trend_dict, theta=0.8)
             article_vector_str = str(article_vector.tolist())
-            print(article_vector_str)
+
             article.vector = 0.0
-            # article.save()
+            article_query.append(article)
             break
+        # Named_entity.objects.bulk_create(named_entity_query)
+        # Trend.objects.bulk_create(trend_query)
+        # Article.objects.bulk_update(article_query, fields=['vector'])
+
     except Exception as e:
         print(e)
         is_success = False
@@ -50,6 +59,22 @@ def calcArticleVector():
     return is_success
 
 def summarize(title, body, isTrend = True ):
+    """本文の内容を３行に要約、keywordの抽出, keywordのtrend値の計算
+
+        Parameters
+        ----------
+        title : str
+            記事のタイトル
+        body : str
+            記事の本文
+        isTrend : bool, default True
+            キーフレーズの単語を結合するか否か
+
+        Returns
+        -------
+        dict
+          {summary: list, ne_list: list, trend: list}
+    """
     # summarization
     model = LexRank()
     summary_list = model.summarize(body)
@@ -66,6 +91,18 @@ def summarize(title, body, isTrend = True ):
     return res
 
 def extract_keyword(doc_list):
+    """本文からキーフレーズの抽出
+
+        Parameters
+        ----------
+        doc_list : list
+            記事の文章
+
+        Returns
+        -------
+        list
+          キーフレーズのリスト   
+    """
     position = PositionRank()
     ne_list = []
     for i, doc in enumerate(doc_list):
@@ -74,6 +111,18 @@ def extract_keyword(doc_list):
     return list(itertools.chain.from_iterable(ne_list))
 
 def get_trend(ne_list):
+    """キーフレーズのトレンド計算
+
+        Parameters
+        ----------
+        ne_list : list
+            キーフレーズのリスト
+
+        Returns
+        -------
+        dict
+            {keyword: score(int)}
+    """
     search_dict = {}
     dt_now = datetime.datetime.now()
     start_frame = (dt_now - relativedelta(months=6)).strftime('%Y-%m-%d')
@@ -87,6 +136,18 @@ def get_trend(ne_list):
     return search_dict
 
 def get_trend_score(word):
+    """キーフレーズのトレンド計算
+
+        Parameters
+        ----------
+        word : str
+            キーワード
+
+        Returns
+        -------
+        int
+            トレンドの値
+    """
     search_dict = {}
     dt_now = datetime.datetime.now()
     start_frame = (dt_now - relativedelta(months=6)).strftime('%Y-%m-%d')
