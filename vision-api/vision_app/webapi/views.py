@@ -50,7 +50,7 @@ class ArticleList(views.APIView):
         article_list = crawler.get_article_list(int(media), url)
         article_list = dict(itertools.islice(article_list.items(), 5))
         
-        ne_list = nlp_utils.extract_keyword(article_list)
+        ne_list = nlp_utils.extract_keyword(article_list, False)
         res = {'article_list': article_list, 'ne_list': ne_list, 'trends': nlp_utils.get_trend(ne_list) } 
         return Response(res)
 
@@ -89,6 +89,7 @@ class Wikipedia(views.APIView):
         wiki2vec = Wikipedia2Vec.load(file_path)
         similar_list = wiki2vec.most_similar(wiki2vec.get_entity(words), 5)
         result = ''
+
         for row in similar_list:
             if(row[0].__class__.__name__ == 'Entity'):
                 result = row[0].title

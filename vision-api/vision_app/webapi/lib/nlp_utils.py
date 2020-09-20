@@ -79,7 +79,7 @@ def summarize(title, body, isTrend = True ):
     model = LexRank()
     summary_list = model.summarize(body)
     res = {'summary': summary_list, 'title': title}
-    ne_list = extract_keyword(summary_list)
+    ne_list = extract_keyword(summary_list, True)
     res['ne_list'] = ne_list
 
     # trends
@@ -90,13 +90,15 @@ def summarize(title, body, isTrend = True ):
     
     return res
 
-def extract_keyword(doc_list):
+def extract_keyword(doc_list, isContent):
     """本文からキーフレーズの抽出
 
         Parameters
         ----------
         doc_list : list
             記事の文章
+        isContent: boolian
+            本文か
 
         Returns
         -------
@@ -106,7 +108,10 @@ def extract_keyword(doc_list):
     position = PositionRank()
     ne_list = []
     for i, doc in enumerate(doc_list):
-        ne_list.append(position.extract(str(doc), topn=10, is_join_words=False))
+        if isContent:
+            ne_list.append(position.extract(str(doc), topn=10, is_join_words=False))
+        else:
+            ne_list.append(position.extract(str(doc), topn=4, is_join_words=False))
 
     return list(itertools.chain.from_iterable(ne_list))
 

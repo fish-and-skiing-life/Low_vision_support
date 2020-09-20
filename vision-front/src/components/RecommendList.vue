@@ -92,8 +92,8 @@
         }
         this.recognition.stop()
       };
-      // recognition.start()
-      // await this.startTalk()
+      this.recognition.start()
+      await this.startTalk()
 
       this.isLoading = false
     },

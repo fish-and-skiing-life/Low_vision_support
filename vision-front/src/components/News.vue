@@ -127,8 +127,8 @@
       };
       
       this.isLoading = false
-      // await this.startTalk()
-      // this.recognition.start()
+      await this.startTalk()
+      this.recognition.start()
     },
     methods:{
       getVoice(){

@@ -71,7 +71,7 @@
         }
         this.recognition.stop()
       };
-      // recognition.start()
+      this.recognition.start()
       await this.startTalk()
       this.isLoading = false
     },
@@ -112,7 +112,13 @@
               console.log(response.data)
               this.word = val
               this.data = response.data
-              this.summary = response.data.summary
+              if(response.data.title == 'error'){
+                this.manuscript = [val + 'は、Wikipediaにありませんでした。他の単語を調べてください。']
+                this.startTalk()
+              }else{
+                this.summary = response.data.summary
+              }
+              
               this.isLoading = false
             }).catch(error => {
               console.log(error)
