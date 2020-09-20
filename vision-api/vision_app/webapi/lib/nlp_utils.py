@@ -10,7 +10,10 @@ from ..models import Trend, Article, Named_entity
 import numpy as np
 
 def calcArticleVector():
-    data = Article.objects.filter(vector = 0.0 )
+    data = Article.objects.filter(vector = '' )
+    test = Article.objects.get(id=1)
+    print(test.vector)
+    print(test.vector == '')
     is_success = True
     position = PositionRank()
     vectorizer = GinzaVectorizer()
@@ -19,8 +22,9 @@ def calcArticleVector():
             key_dict = {}
             trend_dict = {}
             print(article.vector)
-            key_list = position([article.content])
+            key_list = position.extract(article.content)
             for keyword in key_list:
+                print(keyword)
                 vector = vectorizer.encode_phrase(keyword)
                 vector_str = str(vector.tolist())
                 print(vector_str)
@@ -38,7 +42,7 @@ def calcArticleVector():
             print(article_vector_str)
             article.vector = 0.0
             # article.save()
-
+            break
     except Exception as e:
         print(e)
         is_success = False
