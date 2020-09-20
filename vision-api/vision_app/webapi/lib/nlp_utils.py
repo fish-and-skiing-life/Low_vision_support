@@ -77,7 +77,6 @@ def get_trend_score(word):
     try:
         data = pytrend.interest_over_time().drop(['isPartial'], axis=1)
         data = list(itertools.chain.from_iterable(data.values.tolist()))
-        print(data)
         if(sum(data) != 0):
             score = sum(data[-7 :]) / sum(data)
         else: score =0

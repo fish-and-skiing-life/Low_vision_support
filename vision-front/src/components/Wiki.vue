@@ -110,7 +110,7 @@
           axios
             .get(process.env.VUE_APP_API + "/api/wiki", {params: { "word": val} })
             .then(response => {
-
+              console.log(response.data)
               this.word = val
               this.data = response.data
               this.summary = response.data.summary
