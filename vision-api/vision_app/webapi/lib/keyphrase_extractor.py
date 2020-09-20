@@ -1,6 +1,9 @@
 import spacy
 import nltk
 import pke
+import os
+
+from django.conf import settings
 
 
 class PositionRank:
@@ -39,7 +42,10 @@ class PositionRank:
         return self._postprocessing(keyphrases, is_join_words)
 
     def _load_stopwords(self):
-        with open('../res/stopwords.txt') as f:
+        file_path = os.path.join(
+            settings.BASE_DIR, 'webapi/res/stopwords.txt'
+            )
+        with open(file_path) as f:
             stopwords = f.read().split()
 
         return stopwords

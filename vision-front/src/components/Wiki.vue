@@ -48,24 +48,18 @@
         recognition : "",
         recognitionText: "音声入力開始",
         text: "",
-        site_dict: {"ヤフーニュース":0, "朝日新聞":1, "読売新聞":2, "日経新聞":3},
-        site: localStorage.getItem("site"),
-        title: localStorage.getItem("newsTitle"),
-        titleUrl: localStorage.getItem("newsUrl"),
-        fee: localStorage.getItem("newsFee"),
         manuscript: [],
         data: {},
-        show: false,
         summary: []
       }
     },
     async mounted(){
       this.manuscript.push('気になった単語を教えてください。')
 
-      const recognition = new window.webkitSpeechRecognition()
-      recognition.lang = "ja-JP";
-      recognition.continuous = true;
-      this.recognition = recognition;
+      const speechRecognition = new window.webkitSpeechRecognition()
+      speechRecognition.lang = "ja-JP";
+      speechRecognition.continuous = true;
+      this.recognition = speechRecognition;
       this.recognition.onstart = () => {
         this.recognitionText = "音声入力中...";
       };
@@ -113,12 +107,15 @@
           this.$router.push('./wiki')
         }else{
           console.log(val)
+          this.isLoading = true
           axios
             .get(process.env.VUE_APP_API + "/api/wiki", {params: { "word": val} })
             .then(response => {
+              console.log(response.data)
               this.word = val
               this.data = response.data
-              this.sumamry = response.data.summary
+              this.summary = response.data.summary
+              this.isLoading = false
             }).catch(error => {
               console.log(error)
           })

@@ -3,8 +3,10 @@ import spacy
 import itertools
 from pytrends.request import TrendReq
 from dateutil.relativedelta import relativedelta
+from webapi.lib.summarizer import LexRank
 from webapi.lib.keyphrase_extractor import PositionRank
 from ..models import Trend, Article, Named_entity
+import numpy as np
 
 def calcArticleVector():
     data = Article.objects.filter(vector = 0.0 )
@@ -30,7 +32,7 @@ def calcArticleVector():
 
     return is_success
 
-def summarize(title, body ):
+def summarize(title, body, isTrend = True ):
     # summarization
     model = LexRank()
     summary_list = model.summarize(body)
@@ -39,16 +41,20 @@ def summarize(title, body ):
     res['ne_list'] = ne_list
 
     # trends
-    res['trends'] = get_trend(ne_list)
+    if( isTrend ):
+        res['trends'] = get_trend(ne_list)
+    else:
+        res['trends'] = ''
+    
     return res
 
 def extract_keyword(doc_list):
     position = PositionRank()
     ne_list = []
     for i, doc in enumerate(doc_list):
-        ne_list.append(position(str(doc)))
+        ne_list.append(position.extract(str(doc), topn=10, is_join_words=False))
 
-    return list(set(ne_list))
+    return list(itertools.chain.from_iterable(ne_list))
 
 def get_trend(ne_list):
     search_dict = {}
@@ -57,13 +63,10 @@ def get_trend(ne_list):
     end_frame = dt_now.strftime('%Y-%m-%d')
     pytrend = TrendReq(hl='jp-JP', tz=-540, proxies=['http://proxy.nagaokaut.ac.jp:8080'])
     # pytrend = TrendReq(hl='jp-JP', tz=-540)
-
-    for num in range(0, len(ne_list),5):
-        pytrend.build_payload(ne_list[num : num+4], cat=0, timeframe=f'{start_frame} {end_frame}', geo='JP')
-
-        data = pytrend.interest_over_time().drop(['isPartial'], axis=1)
-        search_dict.update(data.apply(lambda col: col.sum()).to_dict())
-
+    
+    for word in ne_list:
+        score = get_trend_score(word)
+        search_dict.update({word: score})
     return search_dict
 
 def get_trend_score(word):
@@ -75,8 +78,14 @@ def get_trend_score(word):
     # pytrend = TrendReq(hl='jp-JP', tz=-540)
 
     pytrend.build_payload([word], cat=0, timeframe=f'{start_frame} {end_frame}', geo='JP')
+    try:
+        data = pytrend.interest_over_time().drop(['isPartial'], axis=1)
+        data = list(itertools.chain.from_iterable(data.values.tolist()))
+        if(sum(data) != 0):
+            score = sum(data[-7 :]) / sum(data)
+        else: score =0
+    except:
+        score = 0
+    
 
-    data = pytrend.interest_over_time().drop(['isPartial'], axis=1)
-    data = list(itertools.chain.from_iterable(data.values.tolist()))
-
-    return sum(data[-7 :]) / sum(data)
+    return score
