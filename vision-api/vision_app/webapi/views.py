@@ -106,7 +106,7 @@ class Wikipedia(views.APIView):
 class CalcDb(views.APIView):
     def get(self, request):
         
-        result = nlp_utils.get_trend_score('ドコモ口座')
+        result = nlp_utils.calcArticleVector()
         return Response({'result': result})
 
 class InsertWiki(views.APIView):

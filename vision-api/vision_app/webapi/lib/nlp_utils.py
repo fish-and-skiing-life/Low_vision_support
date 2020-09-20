@@ -4,6 +4,7 @@ import itertools
 from pytrends.request import TrendReq
 from dateutil.relativedelta import relativedelta
 from webapi.lib.summarizer import LexRank
+from webapi.lib.vectorizer import GinzaVectorizer
 from webapi.lib.keyphrase_extractor import PositionRank
 from ..models import Trend, Article, Named_entity
 import numpy as np
@@ -12,17 +13,29 @@ def calcArticleVector():
     data = Article.objects.filter(vector = 0.0 )
     is_success = True
     position = PositionRank()
+    vectorizer = GinzaVectorizer()
     try:
         for article in data:
+            key_dict = {}
+            trend_dict = {}
             print(article.vector)
             key_list = position([article.content])
             for keyword in key_list:
+                vector = vectorizer.encode_phrase(keyword)
+                vector_str = str(vector.tolist())
+                print(vector_str)
                 named = Named_entity(url = article.url, word = keyword, vector = 0.0)
                 keyword_score = get_trend_score(keyword)
                 trend = Trend(word = keyword, score = keyword_score)
+                key_dict.setdefault(keyword, vector)
+                trend_dict.setdefault(keyword, keyword_score)
                 sleep(40)
                 # named.save()
                 # trend.save()
+
+            article_vector = vectorizer.calc_weighted_article_vector(key_dict, trend_dict, theta=0.8)
+            article_vector_str = str(article_vector.tolist())
+            print(article_vector_str)
             article.vector = 0.0
             # article.save()
 
