@@ -12,7 +12,7 @@ from django.apps import AppConfig
 class WebapiConfig(AppConfig):
     name = 'webapi'
 
-    bert_model = load_bert()
+    bert_model, bert_tokenizer = load_bert()
     ginza_model = load_ginza()
     wiki2vec_model = load_wiki2vec()
 
