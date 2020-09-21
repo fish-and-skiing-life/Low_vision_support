@@ -114,6 +114,7 @@
               this.data = response.data
               if(response.data.title == 'error'){
                 this.manuscript = [val + 'は、Wikipediaにありませんでした。他の単語を調べてください。']
+                this.summary = ['Wikipediaにありませんでした。他の単語を調べてください。']
                 this.startTalk()
               }else{
                 this.summary = response.data.summary

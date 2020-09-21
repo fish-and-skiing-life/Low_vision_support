@@ -187,7 +187,7 @@
           this.speech.cancel()
           this.$router.push('./wiki')
         }
-        else if(val.match(/カテゴリーの変更/)){
+        else if(val.match(/カテゴリー/)){
           this.speech.cancel()
           this.$router.push('./category')
         }

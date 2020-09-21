@@ -87,8 +87,17 @@
     },
     watch:{
       text(val){
-        if(val.match(/it/)){
+        console.log(val)
+        if(val.match(/腫瘍/)){
+          val = "主要"
+        }
+        else if(val.match(/it/ )){
           val = "IT"
+          console.log(val)
+        }
+        else if(val.match(/社会/ && val.match(/暮らし/))){
+          val = "社会・くらし"
+          console.log(val)
         }
         else if(val.match(/社会/ && val.match(/暮らし/))){
           val = "社会・くらし"
@@ -103,6 +112,7 @@
           console.log(val)
         }
         if(this.category_dict[val]){
+          this.speech.cancel()
           localStorage.category = val
           localStorage.category_url = this.category_dict[val]
           this.$router.push('./news-list')

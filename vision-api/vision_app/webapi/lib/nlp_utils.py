@@ -1,3 +1,4 @@
+import regex
 import datetime
 import spacy
 import itertools
@@ -5,6 +6,7 @@ import time
 from pytrends.request import TrendReq
 from dateutil.relativedelta import relativedelta
 from webapi.lib.summarizer import LexRank
+import webapi.lib.scoring as scoring
 from webapi.lib.vectorizer import GinzaVectorizer
 from webapi.lib.keyphrase_extractor import PositionRank
 from ..models import Trend, Article, Named_entity
@@ -33,7 +35,7 @@ def calcArticleVector():
             for keyword in key_list:
                 vector = vectorizer.encode_phrase(keyword)
                 vector_str = str(vector.tolist())
-                named = Named_entity(url = article.url, word = keyword, vector = 0.0)
+                named = Named_entity(url = article.url, word = keyword, vector = vector_str)
                 keyword_score = get_trend_score(keyword)
                 trend = Trend(word = keyword, score = keyword_score)
                 key_dict.setdefault(keyword, vector)
@@ -45,12 +47,12 @@ def calcArticleVector():
             article_vector = vectorizer.calc_weighted_article_vector(key_dict, trend_dict, theta=0.8)
             article_vector_str = str(article_vector.tolist())
 
-            article.vector = 0.0
+            article.vector = article_vector_str
             article_query.append(article)
             break
-        # Named_entity.objects.bulk_create(named_entity_query)
-        # Trend.objects.bulk_create(trend_query)
-        # Article.objects.bulk_update(article_query, fields=['vector'])
+        Named_entity.objects.bulk_create(named_entity_query)
+        Trend.objects.bulk_create(trend_query)
+        Article.objects.bulk_update(article_query, fields=['vector'])
 
     except Exception as e:
         print(e)
@@ -164,11 +166,25 @@ def get_trend_score(word):
     try:
         data = pytrend.interest_over_time().drop(['isPartial'], axis=1)
         data = list(itertools.chain.from_iterable(data.values.tolist()))
-        if(sum(data) != 0):
-            score = sum(data[-7 :]) / sum(data)
-        else: score =0
+        score = scoring.calc_trend_score(data)
     except:
         score = 0
     
 
     return score
+
+
+def split_sentences(text):
+    """正規表現を使用してテキストを文単位で分割する．
+
+    Parameters
+    ----------
+    text : str
+        テキスト
+
+    Returns
+    -------
+    list[str]
+        文のリスト
+    """
+    return [s.strip() for s in regex.findall(r'[\S\s]+?。', text)]
