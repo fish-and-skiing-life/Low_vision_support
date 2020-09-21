@@ -2,8 +2,10 @@ import os
 
 import spacy
 from gensim.models import KeyedVectors
+from wikipedia2vec import Wikipedia2Vec
 from transformers import BertJapaneseTokenizer, BertForMaskedLM
 
+from django.conf import settings
 from django.apps import AppConfig
 
 
@@ -30,7 +32,7 @@ class WebapiConfig(AppConfig):
     def load_ginza():
         print('Load GiNZA model...')
 
-        file_path = os.path.join(settings.BASE_DIR, 'webapi/models/chive-1.1-mc5-20200318.bin)
+        file_path = os.path.join(settings.BASE_DIR, 'webapi/models/chive-1.1-mc5-20200318.bin')
 
         w2v_model = KeyedVectors.load_word2vec_format(file_path,  binary=True)
         nlp = spacy.load('ja_ginza')
