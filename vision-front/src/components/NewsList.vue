@@ -138,11 +138,11 @@
           var text = this.data.ne_list[index]
           console.log(text)
           console.log(this.data.trends[text])
-          if(this.data.trends[text] > 0.4){
+          if(this.data.trends[text] > 0.3){
             return ['large_word']
-          }else if(this.data.trends[text] > 0.1){
+          }else if(this.data.trends[text] > 0.2){
             return ['midle_word']
-          }else if(this.data.trends[text] > 0.07){
+          }else if(this.data.trends[text] > 0.1){
             return ['small_word']
           }
           
@@ -198,11 +198,11 @@
           localStorage.mode = 'news'
           this.$router.push('./news')
         }
-        else if(val.match(/カテゴリーの変更/)){
+        else if(val.match(/カテゴリー/)){
           this.speech.cancel()
           this.$router.push('./category')
         }
-        else if(val.match(/ニュース媒体を選択/)){
+        else if(val.match(/ニュース媒体/)){
           this.speech.cancel()
           this.$router.push('./')
         }
@@ -240,7 +240,7 @@
 }
 
 .large_word{
-  font-size: 2.3em !important;
+  font-size: 2em !important;
   font-weight: bold;
   line-height: 1.4em !important;
 }

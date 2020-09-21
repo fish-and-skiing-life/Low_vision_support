@@ -35,7 +35,7 @@ def calcArticleVector():
             for keyword in key_list:
                 vector = vectorizer.encode_phrase(keyword)
                 vector_str = str(vector.tolist())
-                named = Named_entity(url = article.url, word = keyword, vector = 0.0)
+                named = Named_entity(url = article.url, word = keyword, vector = vector_str)
                 keyword_score = get_trend_score(keyword)
                 trend = Trend(word = keyword, score = keyword_score)
                 key_dict.setdefault(keyword, vector)
@@ -47,12 +47,12 @@ def calcArticleVector():
             article_vector = vectorizer.calc_weighted_article_vector(key_dict, trend_dict, theta=0.8)
             article_vector_str = str(article_vector.tolist())
 
-            article.vector = 0.0
+            article.vector = article_vector_str
             article_query.append(article)
             break
-        # Named_entity.objects.bulk_create(named_entity_query)
-        # Trend.objects.bulk_create(trend_query)
-        # Article.objects.bulk_update(article_query, fields=['vector'])
+        Named_entity.objects.bulk_create(named_entity_query)
+        Trend.objects.bulk_create(trend_query)
+        Article.objects.bulk_update(article_query, fields=['vector'])
 
     except Exception as e:
         print(e)
