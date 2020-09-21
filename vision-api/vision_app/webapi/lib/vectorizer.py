@@ -6,6 +6,9 @@ from ..apps import WebapiConfig
 
 
 class GinzaVectorizer:
+    def __init__(self):
+       self.nlp = WebapiConfig.ginza_model
+
     def encode_phrase(self, phrase):
         """フレーズをベクトル化する，
         フレーズベクトルはフレーズ内の単語の平均ベクトル．
@@ -20,7 +23,7 @@ class GinzaVectorizer:
         numpy.ndarray
             フレーズベクトル
         """        
-        parsed_phrase = WebapiConfig.ginza_model(phrase, disable=['dep', 'ent'])
+        parsed_phrase = self.nlp(phrase, disable=['dep', 'ent'])
         
         return parsed_phrase.vector
 
