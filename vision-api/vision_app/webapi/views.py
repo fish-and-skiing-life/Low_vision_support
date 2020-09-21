@@ -83,7 +83,7 @@ class Recommend(views.APIView):
 class Wikipedia(views.APIView):
     def get(self, request):
         words = request.GET.get('word')
-        wiki2vec = WebapiConfig.wiki2vec_model()
+        wiki2vec = WebapiConfig.wiki2vec_model
         similar_list = wiki2vec.most_similar(wiki2vec.get_entity(words), 5)
         result = ''
 
