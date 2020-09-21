@@ -1,3 +1,4 @@
+import regex
 import datetime
 import spacy
 import itertools
@@ -171,3 +172,19 @@ def get_trend_score(word):
     
 
     return score
+
+
+def split_sentences(text):
+    """正規表現を使用してテキストを文単位で分割する．
+
+    Parameters
+    ----------
+    text : str
+        テキスト
+
+    Returns
+    -------
+    list[str]
+        文のリスト
+    """
+    return [s.strip() for s in regex.findall(r'[\S\s]+?。', text)]

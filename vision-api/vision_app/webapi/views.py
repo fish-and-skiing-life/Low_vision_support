@@ -5,8 +5,8 @@ from rest_framework import views
 
 
 from webapi.lib.crawling import Crawling
-from wikipedia2vec import Wikipedia2Vec
 from django.conf import settings
+from webapi.apps import WebapiConfig
 import webapi.lib.nlp_utils as nlp_utils
 from .models import Wiki, Trend, Article
 import pandas as pd
@@ -82,11 +82,8 @@ class Recommend(views.APIView):
 
 class Wikipedia(views.APIView):
     def get(self, request):
-        file_path = os.path.join(
-            settings.BASE_DIR, 'webapi/modeled/jawiki_20180420_100d.pkl'
-            )
         words = request.GET.get('word')
-        wiki2vec = Wikipedia2Vec.load(file_path)
+        wiki2vec = WebapiConfig.wiki2vec_model
         similar_list = wiki2vec.most_similar(wiki2vec.get_entity(words), 5)
         result = ''
 

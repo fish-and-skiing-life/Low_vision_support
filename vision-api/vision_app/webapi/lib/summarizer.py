@@ -3,15 +3,18 @@ import scipy
 import scipy.spatial
 import spacy
 
+from webapi.apps import WebapiConfig
+from vectorizer import BertVectorizer
+import webapi.lib.nlp_utils as nlp_utils
+
 
 class LexRank:
-    def __init__(self, threshold=0.1, max_iter=100, tol=1e-06, req_pos=['NOUN']):
-        self.nlp = spacy.load('ja_ginza')
+    def __init__(self, threshold=0.1, max_iter=100, tol=1e-06,):
+        self.model = BertVectorizer()
 
         self.max_iter = max_iter
         self.tol = tol
         self.threshold = threshold
-        self.req_pos = req_pos.copy()
 
     def summarize(self, text, topn=3):
         """
@@ -26,25 +29,21 @@ class LexRank:
 
         Returns
         -------
-        summary : List[str]
+        List[str]
             重要文のリスト
         """
-        doc = self.nlp(text)
-        sent_text = np.array([sent.text for sent in doc.sents])
-
         # 文単位に分割してベクトル化
-        sent_vectors = np.array([self.vectorize_sentence(sent) for sent in doc.sents])
+        sents = np.array(nlp_utils.split_sentences(text))
+        sent_vectors = np.array([self.vectorize_sentence(sent) for sent in sents])
         # lexrankを計算
         scores = self.calc_scores(sent_vectors)
         # 上位topn件の文を返す
         topn_indexes = scores.argsort()[::-1][:topn]
 
-        return sent_text[topn_indexes]
+        return sents[topn_indexes]
 
     def vectorize_sentence(self, sentence):
-        # 必要な品詞の単語のみ抽出して word vector の平均値を求める
-        vecs = [token.vector for token in sentence if token.pos_ in self.req_pos]
-        return np.mean(vecs, axis=0)
+        return self.model.encode_sentence(sentence)
 
     def calc_scores(self, sent_vectors):
         N = len(sent_vectors)
@@ -54,7 +53,7 @@ class LexRank:
         # 隣接行列を求める
         for i in range(N):
             for j in range(N):
-                cos_mat[i, j] = scipy.spatial.distance.cosine(sent_vectors[i], sent_vectors[j])
+                cos_mat[i, j] = 1.0 - scipy.spatial.distance.cosine(sent_vectors[i], sent_vectors[j])
                 
                 if cos_mat[i, j] > self.threshold:
                     cos_mat[i, j] = 1
