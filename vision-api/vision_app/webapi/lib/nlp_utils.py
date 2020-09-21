@@ -5,6 +5,7 @@ import time
 from pytrends.request import TrendReq
 from dateutil.relativedelta import relativedelta
 from webapi.lib.summarizer import LexRank
+import webapi.lib.scoring as scoring
 from webapi.lib.vectorizer import GinzaVectorizer
 from webapi.lib.keyphrase_extractor import PositionRank
 from ..models import Trend, Article, Named_entity
@@ -164,9 +165,7 @@ def get_trend_score(word):
     try:
         data = pytrend.interest_over_time().drop(['isPartial'], axis=1)
         data = list(itertools.chain.from_iterable(data.values.tolist()))
-        if(sum(data) != 0):
-            score = sum(data[-7 :]) / sum(data)
-        else: score =0
+        score = scoring.calc_trend_score(data)
     except:
         score = 0
     
