@@ -5,7 +5,7 @@ import spacy
 
 from webapi.apps import WebapiConfig
 from vectorizer import BertVectorizer
-import nlp_utils
+import webapi.lib.nlp_utils as nlp_utils
 
 
 class LexRank:

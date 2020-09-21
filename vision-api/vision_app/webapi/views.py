@@ -6,7 +6,7 @@ from rest_framework import views
 
 from webapi.lib.crawling import Crawling
 from django.conf import settings
-from .apps import WebapiConfig
+from webapi.apps import WebapiConfig
 import webapi.lib.nlp_utils as nlp_utils
 from .models import Wiki, Trend, Article
 import pandas as pd

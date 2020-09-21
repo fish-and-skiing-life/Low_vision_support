@@ -2,7 +2,7 @@ import numpy as np
 import spacy
 import torch
 
-from ..apps import WebapiConfig
+from webapi.apps import WebapiConfig
 
 
 class GinzaVectorizer:
