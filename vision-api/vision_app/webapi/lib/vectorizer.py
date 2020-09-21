@@ -1,10 +1,13 @@
 import numpy as np
 import spacy
+import torch
+
+from webapi.apps import WebapiConfig
 
 
 class GinzaVectorizer:
     def __init__(self):
-        self.parser = spacy.load('ja_ginza')
+       self.nlp = WebapiConfig.ginza_model
 
     def encode_phrase(self, phrase):
         """フレーズをベクトル化する，
@@ -20,7 +23,7 @@ class GinzaVectorizer:
         numpy.ndarray
             フレーズベクトル
         """        
-        parsed_phrase = self.parser(phrase, disable=['dep', 'ent'])
+        parsed_phrase = self.nlp(phrase, disable=['dep', 'ent'])
         
         return parsed_phrase.vector
 
@@ -53,3 +56,36 @@ class GinzaVectorizer:
             weighted_phrase_vectors.append(weighted_phrase_vector)
 
         return np.array(weighted_phrase_vectors).mean(axis=0)
+
+
+class BertVectorizer:
+    def __init__(self):
+        self.tokenizer = WebapiConfig.bert_tokenizer
+        self.model = WebapiConfig.bert_model
+
+    def encode_sentence(self, sentence):
+        """BERTを利用して sentence vector を得る．
+
+        Parameters
+        ----------
+        sentence : str
+            文
+
+        Returns
+        -------
+        numpy.ndarray
+            sentence vector
+        """
+        tokens = self.tokenizer.tokenize(sentence) 
+        tokens = ['[CLS]'] + tokens + ['[SEP]']
+
+        tokens = self.tokenizer.convert_tokens_to_ids(tokens)
+
+        tokens = torch.tensor([tokens])
+
+        with torch.no_grad():
+            outputs = self.model(tokens)
+            # [CLS]の分散表現を sentence vector とする
+            sent_vec = outputs[0][0, 0]
+        
+        return sent_vec.numpy()
