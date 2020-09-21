@@ -1,11 +1,10 @@
 import numpy as np
 import spacy
 
+from ..apps import WebapiConfig
+
 
 class GinzaVectorizer:
-    def __init__(self):
-        self.parser = spacy.load('ja_ginza')
-
     def encode_phrase(self, phrase):
         """フレーズをベクトル化する，
         フレーズベクトルはフレーズ内の単語の平均ベクトル．
@@ -20,7 +19,7 @@ class GinzaVectorizer:
         numpy.ndarray
             フレーズベクトル
         """        
-        parsed_phrase = self.parser(phrase, disable=['dep', 'ent'])
+        parsed_phrase = WebapiConfig.ginza_model(phrase, disable=['dep', 'ent'])
         
         return parsed_phrase.vector
 
