@@ -39,7 +39,7 @@ class ArticleRecommender:
         # nanが入っているデータは削除
         article_df.dropna(inplace=True)
         # URLが重複している記事は削除
-        article_df.drop_duplicates(['body'], keep='last', inplace=True)
+        article_df.drop_duplicates(['url'], keep='last', inplace=True)
         # 記事ベクトルを文字列からnumpy.ndarrayに変換
         article_df.loc[:, 'vector'] = article_df.apply(
             lambda x: self._str2vec(x['vector'])
