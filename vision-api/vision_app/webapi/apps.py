@@ -11,45 +11,68 @@ from django.apps import AppConfig
 
 class WebapiConfig(AppConfig):
     name = 'webapi'
+    print('load Bert')
+    file_path = os.path.join(settings.BASE_DIR, 'webapi/models/bert-base-japanese-whole-word-masking')
 
-    bert_model, bert_tokenizer = load_bert()
-    ginza_model = load_ginza()
-    wiki2vec_model = load_wiki2vec()
+    bert_tokenizer = BertJapaneseTokenizer.from_pretrained(file_path)
+    bert_model = BertForMaskedLM.from_pretrained(file_path)
+    bert_model.eval()
 
-    @staticmethod
-    def load_bert():
-        print('Load BERT model...')
+    print('Load GiNZA model...')
 
-        file_path = os.path.join(settings.BASE_DIR, 'webapi/models/bert-base-japanese-whole-word-masking')
+    file_path = os.path.join(settings.BASE_DIR, 'webapi/models/chive-1.1-mc5-20200318.bin')
 
-        tokenizer = BertJapaneseTokenizer.from_pretrained(file_path)
-        model = BertForMaskedLM.from_pretrained(file_path)
-        model.eval()
+    w2v_model = KeyedVectors.load_word2vec_format(file_path,  binary=True)
+    ginza_model = spacy.load('ja_ginza')
 
-        return model, tokenizer
+    ginza_model.vocab.reset_vectors(width=w2v_model.vectors.shape[1])
+    for word in w2v_model.vocab.keys():
+        ginza_model.vocab[word]
+        ginza_model.vocab.set_vector(word, w2v_model[word])
 
-    @staticmethod
-    def load_ginza():
-        print('Load GiNZA model...')
+    print('Load wiki2vec model...')
 
-        file_path = os.path.join(settings.BASE_DIR, 'webapi/models/chive-1.1-mc5-20200318.bin')
+    file_path = os.path.join(settings.BASE_DIR, 'webapi/models/jawiki_20180420_100d.pkl')
+    
+    wiki2vec_model = Wikipedia2Vec.load(file_path)
 
-        w2v_model = KeyedVectors.load_word2vec_format(file_path,  binary=True)
-        nlp = spacy.load('ja_ginza')
+    print('done')
 
-        nlp.vocab.reset_vectors(width=w2v_model.vectors.shape[1])
-        for word in w2v_model.vocab.keys():
-            nlp.vocab[word]
-            nlp.vocab.set_vector(word, w2v_model[word])
 
-        return nlp
+    # @staticmethod
+    # def load_bert():
+    #     print('Load BERT model...')
 
-    @staticmethod
-    def load_wiki2vec():
-        print('Load wiki2vec model...')
+    #     file_path = os.path.join(settings.BASE_DIR, 'webapi/models/bert-base-japanese-whole-word-masking')
 
-        file_path = os.path.join(settings.BASE_DIR, 'webapi/modeles/jawiki_20180420_100d.pkl')
+    #     tokenizer = BertJapaneseTokenizer.from_pretrained(file_path)
+    #     model = BertForMaskedLM.from_pretrained(file_path)
+    #     model.eval()
+
+    #     return model, tokenizer
+
+    # @staticmethod
+    # def load_ginza():
+    #     print('Load GiNZA model...')
+
+    #     file_path = os.path.join(settings.BASE_DIR, 'webapi/models/chive-1.1-mc5-20200318.bin')
+
+    #     w2v_model = KeyedVectors.load_word2vec_format(file_path,  binary=True)
+    #     nlp = spacy.load('ja_ginza')
+
+    #     nlp.vocab.reset_vectors(width=w2v_model.vectors.shape[1])
+    #     for word in w2v_model.vocab.keys():
+    #         nlp.vocab[word]
+    #         nlp.vocab.set_vector(word, w2v_model[word])
+
+    #     return nlp
+
+    # @staticmethod
+    # def load_wiki2vec():
+    #     print('Load wiki2vec model...')
+
+    #     file_path = os.path.join(settings.BASE_DIR, 'webapi/modeles/jawiki_20180420_100d.pkl')
         
-        wiki2vec_model = Wikipedia2Vec.load(file_path)
+    #     wiki2vec_model = Wikipedia2Vec.load(file_path)
 
-        return wiki2vec_model
+    #     return wiki2vec_model
