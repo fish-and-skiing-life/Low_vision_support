@@ -13,7 +13,29 @@ class ArticleRecommender:
             FROM webapi_article
             WHERE vector != ''
         """
-        self.article_df = pd.read_sql_query(query, connection)
+        # 記事データの読み込み
+        article_df = pd.read_sql_query(query, connection)
+
+        # 記事ベクトルを文字列からnumpy.ndarrayに変換
+        article_df.loc[:, 'vector'] = article_df.apply(
+            lambda x: self._str2vec(x['vector'])
+            , axis=1
+        )
+
+        self.article_df = article_df.dropna()
+
+    def _str2vec(self, raw_vec):
+        # eval に失敗したらnp.nanを返す
+        try:
+            vec = eval(raw_vec)
+        except Exception:
+            return np.nan
+        
+        # listでなければnp.nanを返す
+        if not isinstance(vec, list):
+            return np.nan
+        
+        return np.array(vec)
 
     def get_similar_articles(self, article_url, article_vector, topn=5):
         # 読んでいる記事以外の記事の情報を取得する
