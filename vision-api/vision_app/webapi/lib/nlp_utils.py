@@ -20,6 +20,10 @@ def calcArticleVector():
         Boolian
           成功か失敗か
     """
+    trend_data = Trend.objects.all()
+    trend_word = {}
+    for row in trend_data:
+        trend_word.setdefault(row.word, row.score)
     data = Article.objects.filter(vector = '' )
     is_success = True
     position = PositionRank()
@@ -28,28 +32,45 @@ def calcArticleVector():
     trend_query = []
     article_query = []
     try:
-        for article in data:
+        for index, article in enumerate(data):
+            if index % 30 == 0 and index != 0:
+                Named_entity.objects.bulk_create(named_entity_query)
+                Trend.objects.bulk_create(trend_query)
+                Article.objects.bulk_update(article_query, fields=['vector'])
+                named_entity_query = []
+                trend_query = []
+                article_query = []
+                print('aaaaaaaaa')
+            if index % 100 == 0:
+                print(index)
+
             key_dict = {}
             trend_dict = {}
             key_list = position.extract(article.content)
+
             for keyword in key_list:
                 vector = vectorizer.encode_phrase(keyword)
                 vector_str = str(vector.tolist())
                 named = Named_entity(url = article.url, word = keyword, vector = vector_str)
-                keyword_score = get_trend_score(keyword)
-                trend = Trend(word = keyword, score = keyword_score)
+                if keyword not in trend_word:
+                    keyword_score = get_trend_score(keyword)
+                    trend = Trend(word = keyword, score = keyword_score)
+                    time.sleep(10)
+                    trend_word.setdefault(keyword, keyword_score)
+                    trend_query.append(trend)
+                else:
+                    keyword_score = trend_word[keyword]
+
                 key_dict.setdefault(keyword, vector)
                 trend_dict.setdefault(keyword, keyword_score)
                 named_entity_query.append(named)
-                trend_query.append(trend)
-                time.sleep(40)
 
             article_vector = vectorizer.calc_weighted_article_vector(key_dict, trend_dict, theta=0.8)
             article_vector_str = str(article_vector.tolist())
 
             article.vector = article_vector_str
             article_query.append(article)
-            break
+            
         Named_entity.objects.bulk_create(named_entity_query)
         Trend.objects.bulk_create(trend_query)
         Article.objects.bulk_update(article_query, fields=['vector'])

@@ -103,8 +103,9 @@ class Wikipedia(views.APIView):
 
 class CalcDb(views.APIView):
     def get(self, request):
-        
+        print('start calcDb')        
         result = nlp_utils.calcArticleVector()
+        print('end calcDb')
         return Response({'result': result})
 
 class InsertWiki(views.APIView):
