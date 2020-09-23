@@ -241,6 +241,8 @@ def get_recommend(url, article):
         vectorizer = GinzaVectorizer()
 
         key_list = position.extract(article)
+        trend_dict = {}
+        key_dict = {}
 
         for keyword in key_list:
             if keyword not in trend_word:
@@ -248,7 +250,6 @@ def get_recommend(url, article):
                 trend = Trend(word = keyword, score = keyword_score)
                 time.sleep(10)
                 trend_word.setdefault(keyword, keyword_score)
-                trend_query.append(trend)
             else:
                 keyword_score = trend_word[keyword]
             trend_dict.setdefault(keyword, keyword_score)
@@ -263,6 +264,6 @@ def get_recommend(url, article):
 
     recommend = {}
     for recommend_article in recommend_list:
-        recommend.update(recommend)
+        recommend.update(recommend_article)
     
     return recommend
