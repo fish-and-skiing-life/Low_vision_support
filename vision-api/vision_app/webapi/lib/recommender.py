@@ -11,6 +11,23 @@ class ArticleRecommender:
         self.article_df = self._load_articles()
 
     def get_similar_articles(self, article_url, article_vector, topn=5):
+        """類似度の高い記事を返す．
+
+        Parameters
+        ----------
+        article_url : str
+            読んでいる記事のURL
+        article_vector : numpy.ndarray
+            読んでいる記事の article vector
+        topn : int, default 5
+            類似度上位topn件の記事を返す
+
+        Returns
+        -------
+        list[dict[str, str]]
+            類似記事のリスト．
+            各要素は辞書型で `{title: url}` 
+        """
         # 読んでいる記事以外の記事の情報を取得する
         other_df = self.article_df.loc[self.article_df['url'] != article_url].reset_index(drop=True)
         other_vecs = self._get_vectors(other_df)
