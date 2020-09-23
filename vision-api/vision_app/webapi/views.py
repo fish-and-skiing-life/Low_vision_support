@@ -67,19 +67,6 @@ class RecommendList(views.APIView):
 
         return Response(res)
 
-class Recommend(views.APIView):
-    def get(self, request):
-        url = request.GET.get('news_url')
-        res = {'recommend':
-                    {
-                        "日本人CA150人、失職の危機　米ユナイテッド、成田勤務": "https://news.yahoo.co.jp/articles/bc6e2bbf2000ee2c636c67f56aee6faa24dac0e3",
-                        '観光政策変わる？自民総裁選、京都の業界も熱視線　「日本人客を大切にするべき」声も': 'https://news.yahoo.co.jp/pickup/6371062',
-                        '「倒産・廃業の予備軍多い」　年末ごろから急増の恐れも': 'https://news.yahoo.co.jp/articles/adec416d5e9fc7b662d7b9abc0336628c44f1f90'
-                    }
-                }
-
-        return Response(res)
-
 class Wikipedia(views.APIView):
     def get(self, request):
         words = request.GET.get('word')
