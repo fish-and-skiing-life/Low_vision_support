@@ -31,7 +31,7 @@ class SummarizationAndRecommendation(views.APIView):
             return Response(nlp_utils.get_recommend(url, article['body']))
         # other
         else:
-            retrun Response({'error': 'no such this mode.'})
+            return Response({'error': 'no such this mode.'})
 
 class ArticleCategory(views.APIView):
     def get(self, request):
