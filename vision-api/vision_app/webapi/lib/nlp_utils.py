@@ -239,8 +239,7 @@ def get_recommend(url, article):
     
     Returns
     -------
-    dict[recommend: dict[str, str]]
-        類似記事のリスト．
+    dict[str, str]
         各要素は辞書型で `{title: url}`
     """
     vector = get_sentence_vector(article.replace('\n', ''))

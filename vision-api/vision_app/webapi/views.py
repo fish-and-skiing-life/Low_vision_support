@@ -12,7 +12,7 @@ from .models import Wiki, Trend, Article
 import pandas as pd
 
 
-class ArticleSummarization(views.APIView):
+class SummarizationAndRecommendation(views.APIView):
     def get(self, request):
         media = request.GET.get('media')
         url = request.GET.get('url')
@@ -31,7 +31,7 @@ class ArticleSummarization(views.APIView):
             return Response(nlp_utils.get_recommend(url, article['body']))
         # other
         else:
-            retrun Response({'error': 'no such mode'})
+            retrun Response({'error': 'no such this mode.'})
 
 class ArticleCategory(views.APIView):
     def get(self, request):
@@ -54,18 +54,6 @@ class ArticleList(views.APIView):
         
         ne_list = nlp_utils.extract_keyword(article_list, False)
         res = {'article_list': article_list, 'ne_list': ne_list, 'trends': nlp_utils.get_trend(ne_list) } 
-        return Response(res)
-
-class RecommendList(views.APIView):
-    def get(self, request):
-        url = request.GET.get('news_url')
-        media = request.GET.get('media')
-
-        crawler = Crawling()
-        article = crawler.get_article(int(media), url)
-
-        res = nlp_utils.get_recommend(url, article)
-
         return Response(res)
 
 class Wikipedia(views.APIView):
