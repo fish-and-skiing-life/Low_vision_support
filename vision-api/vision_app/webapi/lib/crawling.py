@@ -76,7 +76,7 @@ class Crawling:
             elif site_id == 2:
                 try:
                     li_text = li.get_text()
-                    if 'トピックス' in li_text or '地域' in li_text or 'まとめ' in li_text or '趣味' in li_text: continue
+                    if 'トピックス' in li_text or '地域' in li_text or 'まとめ読み' in li_text or '趣味' in li_text: continue
                     category.setdefault(li_text, self.base[site_id] + li.find('a').get('href') )
                 except:
                     print('error')
