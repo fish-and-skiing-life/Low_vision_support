@@ -22,7 +22,7 @@ class ArticleRecommender:
         # 類似記事抽出
         similar_article_df = other_df.loc[most_similar_indices, ['url', 'title']]
 
-        return [{url: title} for _, (url, title) in similar_article_df.iterrows()]
+        return [{row['title']: row['url']} for _, row in similar_article_df.iterrows()]
 
     def calc_similarities(self, target, others):
         similarities =  [scipy.spatial.distance.cosine(target, other) for other in others]
