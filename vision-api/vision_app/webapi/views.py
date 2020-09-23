@@ -14,22 +14,24 @@ import pandas as pd
 
 class ArticleSummarization(views.APIView):
     def get(self, request):
-        media_dict = {
-            '0': 'https://news.yahoo.co.jp/articles/',
-            '1': 'https://www.asahi.com/articles/',
-            '2': 'https://www.yomiuri.co.jp/',
-            '3': 'https://www.nikkei.com/article/'
-        }
         media = request.GET.get('media')
         url = request.GET.get('url')
+        mode = request.GET.get('mode')
 
         # crawiling
         crawler = Crawling()
         article = crawler.get_article(int(media), url)
         print(article)
-        # summarization
 
-        return Response(nlp_utils.summarize(article['title'], article['body']))
+        # summarization
+        if mode == 'summarize':
+            return Response(nlp_utils.summarize(article['title'], article['body']))
+        # recommend
+        elif mode == 'recommend':
+            return Response(nlp_utils.get_recommend(url, article['body']))
+        # other
+        else:
+            retrun Response({'error': 'no such mode'})
 
 class ArticleCategory(views.APIView):
     def get(self, request):
