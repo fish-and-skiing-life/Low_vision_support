@@ -7,7 +7,7 @@ from pytrends.request import TrendReq
 from dateutil.relativedelta import relativedelta
 from webapi.lib.summarizer import LexRank
 import webapi.lib.scoring as scoring
-from webapi.lib.vectorizer import GinzaVectorizer, BertVectorizer
+from webapi.lib.vectorizer import GinzaVectorizer
 from webapi.lib.recommender import ArticleRecommender
 from webapi.lib.keyphrase_extractor import PositionRank
 from ..models import Trend, Article, Named_entity
@@ -211,22 +211,6 @@ def split_sentences(text):
     """
     return [s.strip() for s in regex.findall(r'[\S\s]+?。', text)]
 
-def get_sentence_vector(sentence):
-    """文のベクトルを計算する
-
-    Parameters
-    ----------
-    sentence : str
-        文
-    
-    Returns
-    -------
-    numpy.ndarray
-        sentence vector
-    """
-    vectorizer = BertVectorizer()
-    return vectorizer.encode_sentence(sentence)
-
 def get_recommend(url, article):
     """記事をレコメンドする
 
@@ -242,10 +226,40 @@ def get_recommend(url, article):
     dict[str, str]
         各要素は辞書型で `{title: url}`
     """
-    vector = get_sentence_vector(article.replace('\n', ''))
+    try:
+        article_info = Article.objects.get(url=url)
+        vector_str = article_info.vector
+        vector_str.replace('[', '').replace(']', '').replace(' ', '').split(',')
+        article_vector = np.array([float(vs) for vs in vector_str])
+
+    except:
+        trend_data = Trend.objects.all()
+        trend_word = {}
+        for row in trend_data:
+            trend_word.setdefault(row.word, row.score)
+        position = PositionRank()
+        vectorizer = GinzaVectorizer()
+
+        key_list = position.extract(article)
+
+        for keyword in key_list:
+            if keyword not in trend_word:
+                keyword_score = get_trend_score(keyword)
+                trend = Trend(word = keyword, score = keyword_score)
+                time.sleep(10)
+                trend_word.setdefault(keyword, keyword_score)
+                trend_query.append(trend)
+            else:
+                keyword_score = trend_word[keyword]
+            trend_dict.setdefault(keyword, keyword_score)
+
+            vector = vectorizer.encode_phrase(keyword)
+            key_dict.setdefault(keyword, vector)
+
+        article_vector = vectorizer.calc_weighted_article_vector(key_dict, trend_dict, theta=0.8)
 
     recommender = ArticleRecommender()
-    recommend_list = recommender.get_similar_articles(url, vector)
+    recommend_list = recommender.get_similar_articles(url, article_vector)
 
     recommend = {}
     for recommend_article in recommend_list:
