@@ -7,7 +7,8 @@ from pytrends.request import TrendReq
 from dateutil.relativedelta import relativedelta
 from webapi.lib.summarizer import LexRank
 import webapi.lib.scoring as scoring
-from webapi.lib.vectorizer import GinzaVectorizer
+from webapi.lib.vectorizer import GinzaVectorizer, BertVectorizer
+from webapi.lib.recommender import ArticleRecommender
 from webapi.lib.keyphrase_extractor import PositionRank
 from ..models import Trend, Article, Named_entity
 import numpy as np
@@ -209,3 +210,45 @@ def split_sentences(text):
         文のリスト
     """
     return [s.strip() for s in regex.findall(r'[\S\s]+?。', text)]
+
+def get_sentence_vector(sentence):
+    """文のベクトルを計算する
+
+    Parameters
+    ----------
+    sentence : str
+        文
+    
+    Returns
+    -------
+    numpy.ndarray
+        sentence vector
+    """
+    vectorizer = BertVectorizer()
+    return vectorizer.encode_sentence(sentence)
+
+def get_recommend(url, article):
+    """記事をレコメンドする
+
+    Parameters
+    ----------
+    url : str
+        記事のURL
+    article: str
+        記事本文
+    
+    Returns
+    -------
+    dict[str, str]
+        各要素は辞書型で `{title: url}`
+    """
+    vector = get_sentence_vector(article.replace('\n', ''))
+
+    recommender = ArticleRecommender()
+    recommend_list = recommender.get_similar_articles(url, vector)
+
+    recommend = {}
+    for recommend_article in recommend_list:
+        recommend.update(recommend)
+    
+    return recommend
