@@ -12,26 +12,38 @@ from .models import Wiki, Trend, Article
 import pandas as pd
 
 
-class SummarizationAndRecommendation(views.APIView):
+class Summarization(views.APIView):
     def get(self, request):
         media = request.GET.get('media')
         url = request.GET.get('url')
         mode = request.GET.get('mode')
 
         # crawiling
-        crawler = Crawling()
-        article = crawler.get_article(int(media), url)
+        if mode == 'new':
+            crawler = Crawling()
+            article = crawler.get_article(int(media), url)
+        elif mode == 'recommend':
+            article = Article.objects.filter(url = url)[0]
         print(article)
 
-        # summarization
-        if mode == 'summarize':
-            return Response(nlp_utils.summarize(article['title'], article['body']))
-        # recommend
+        return Response(nlp_utils.summarize(article['title'], article['body']))
+
+class Recommendation(views.APIView):
+    def get(self, request):
+        media = request.GET.get('media')
+        url = request.GET.get('url')
+        mode = request.GET.get('mode')
+
+        # crawiling
+        if mode == 'new':
+            crawler = Crawling()
+            article = crawler.get_article(int(media), url)
         elif mode == 'recommend':
-            return Response(nlp_utils.get_recommend(url, article['body']))
-        # other
-        else:
-            return Response({'error': 'no such this mode.'})
+            article = Article.objects.filter(url = url)[0]
+
+        print(article)
+        return Response(nlp_utils.get_recommend(url, article['body']))
+
 
 class ArticleCategory(views.APIView):
     def get(self, request):
@@ -79,9 +91,9 @@ class Wikipedia(views.APIView):
 
 class CalcDb(views.APIView):
     def get(self, request):
-        print('start calcDb')        
+        print('start calcDB')
         result = nlp_utils.calcArticleVector()
-        print('end calcDb')
+        print('end calcDB')
         return Response({'result': result})
 
 class InsertWiki(views.APIView):

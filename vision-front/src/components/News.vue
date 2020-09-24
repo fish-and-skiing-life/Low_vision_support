@@ -83,7 +83,7 @@
             for( var ne_index in response.data.ne_list){
               this.neList.push(response.data.ne_list[ne_index].replace(/\s+/g, ''))
             }
-            this.regular_expresion = new RegExp('(' + response.data.ne_list.join('|') + ')', 'i');
+            this.regular_expresion = new RegExp('(' + this.ne_list.join('|') + ')', 'i');
           }else{
             this.manuscript.push('ニュース記事のクローリングに失敗しました。')
             this.manuscript.push('他のニュース媒体を選択するか、違うカテゴリーを選択するか、違う記事を選択してください。')

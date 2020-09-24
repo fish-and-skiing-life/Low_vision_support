@@ -25,6 +25,7 @@ def calcArticleVector():
     trend_word = {}
     for row in trend_data:
         trend_word.setdefault(row.word, row.score)
+
     data = Article.objects.filter(vector = '' )
     is_success = True
     position = PositionRank()

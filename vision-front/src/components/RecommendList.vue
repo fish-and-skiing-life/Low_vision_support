@@ -60,7 +60,7 @@
     },
     async mounted(){
       await axios
-        .get(process.env.VUE_APP_API + "/api/recommend_list", {params: { "news_url": this.titleUrl} })
+        .get(process.env.VUE_APP_API + "/api/recommend", {params: {"media": this.site_dict[this.site], "url": this.titleUrl, 'mode': this.mode} })
         .then(response => {
           console.log(response.data)
           this.data = response.data

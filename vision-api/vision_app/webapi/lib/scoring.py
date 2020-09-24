@@ -55,7 +55,7 @@ def calc_trend_score(x, recent_span=7):
         修正トレンドスコア
     """
     macd_score = calc_moving_average_convergence_divergence(x, recent_span)
-
+    
     if macd_score < 0:
         return 0.0
     

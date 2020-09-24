@@ -47,7 +47,6 @@ class PositionRank:
             )
         with open(file_path) as f:
             stopwords = f.read().split()
-
         return stopwords
 
     def _postprocessing(self, keyphrases, is_join_words=True):

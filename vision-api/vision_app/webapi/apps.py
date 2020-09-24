@@ -3,7 +3,7 @@ import os
 import spacy
 from gensim.models import KeyedVectors
 from wikipedia2vec import Wikipedia2Vec
-from transformers import BertJapaneseTokenizer, BertForMaskedLM
+from transformers.modeling_bert import BertModel, BertForMaskedLM
 
 from django.conf import settings
 from django.apps import AppConfig
@@ -75,4 +75,8 @@ class WebapiConfig(AppConfig):
         
     #     wiki2vec_model = Wikipedia2Vec.load(file_path)
 
+<<<<<<< HEAD
     #     return wiki2vec_model
+=======
+    #     return wiki2vec_model
+>>>>>>> bf65619a2a7dfe15f3d20845d1923e311ba804c5
