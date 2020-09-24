@@ -11,7 +11,13 @@ from django.apps import AppConfig
 
 class WebapiConfig(AppConfig):
     name = 'webapi'
-    print('load Bert')
+
+    print('load stop words...')
+    file_path = os.path.join(settings.BASE_DIR, 'webapi/res/stopwords.txt')
+    with open(file_path, 'r') as f:
+        stop_words = f.read().split()
+
+    print('load Bert...')
     file_path = os.path.join(settings.BASE_DIR, 'webapi/models/bert-base-japanese-whole-word-masking')
 
     bert_tokenizer = BertJapaneseTokenizer.from_pretrained(file_path)
