@@ -5,6 +5,7 @@ import itertools
 import time
 from pytrends.request import TrendReq
 from dateutil.relativedelta import relativedelta
+from webapi.apps import WebapiConfig
 from webapi.lib.summarizer import LexRank
 import webapi.lib.scoring as scoring
 from webapi.lib.vectorizer import GinzaVectorizer
@@ -146,6 +147,35 @@ def extract_keyword(doc_list, isContent):
             ne_list.append(position.extract(str(doc), topn=4, is_join_words=False))
 
     return list(itertools.chain.from_iterable(ne_list))
+
+def extract_noun_chunks(text, is_join=False):
+    """複合名詞を抽出する．
+
+    Parameters
+    ----------
+    text : str
+        テキスト
+    is_join : bool, default False
+        複合名詞の単語を結合するか否か
+
+    Returns
+    -------
+    List[str]
+        キーフレーズのリスト
+    """
+    doc = WebapiConfig.ginza_model(text, disable=['ner', 'dep'])
+    
+    chunk_list = []
+    for chunk in doc.noun_chunks:
+        if chunk.text in WebapiConfig.stop_words:
+            continue
+        
+        if is_join:
+            chunk_list.append(chunk.text)
+        else:
+            chunk_list.append([token.text for token in list(chunk)])
+            
+    return chunk_list
 
 def get_trend(ne_list):
     """キーフレーズのトレンド計算
