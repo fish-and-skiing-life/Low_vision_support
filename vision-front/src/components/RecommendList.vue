@@ -52,6 +52,7 @@
         title: localStorage.getItem("newsTitle"),
         titleUrl: localStorage.getItem("newsUrl"),
         fee: localStorage.getItem("newsFee"),
+        mode: localStorage.getItem("mode"),
         manuscript: [],
         data: {},
         show: false,
