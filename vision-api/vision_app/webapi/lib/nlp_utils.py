@@ -262,7 +262,6 @@ def get_recommend(url, article):
 
     recommender = ArticleRecommender()
     recommend_list = recommender.get_similar_articles(url, article_vector)
-
     recommend = {}
     for recommend_article in recommend_list:
         recommend.update(recommend_article)
