@@ -82,8 +82,8 @@
 
             for( var ne_index in response.data.ne_list){
               this.neList.push(response.data.ne_list[ne_index].replace(/\s+/g, ''))
-            }i
-            this.regular_expresion = new RegExp('(' + this.ne_list.join('|') + ')', 'i');
+            }
+            this.regular_expresion = new RegExp('(' + this.neList.join('|') + ')', 'i');
           }else{
             this.manuscript.push('ニュース記事のクローリングに失敗しました。')
             this.manuscript.push('他のニュース媒体を選択するか、違うカテゴリーを選択するか、違う記事を選択してください。')
@@ -100,7 +100,7 @@
           this.manuscript.push('違う記事を選択する場合は、記事の変更と発声してください')
           console.log(error)
       })
-
+      console.log(this.regular_expresion)
       for(var row in this.news.summary){
         this.content.push( this.news.summary[row].replace(/\s+/g, '').split(this.regular_expresion) )
       }
@@ -146,15 +146,17 @@
         window.setTimeout(() => {},waitMsec)
       },
       calcHot(word){
+        console.log(word)
         var index = this.neList.indexOf(word)
+        console.log(index)
         if(index !== -1){
           var text = this.news.ne_list[index]
 
           if(this.news.trends[text]  > 0.3){
             return ['large_word']
-          }else if(this.news.trends[text]  > 0.1){
+          }else if(this.news.trends[text]  > 0.2){
             return ['midle_word']
-          }else if(this.news.trends[text]  > 0.07){
+          }else if(this.news.trends[text]  > 0.1){
             return ['small_word']
           }
           

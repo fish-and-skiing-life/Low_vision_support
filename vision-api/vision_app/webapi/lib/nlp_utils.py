@@ -104,12 +104,19 @@ def summarize(title, body, isTrend = True ):
     model = LexRank()
     summary_list = model.summarize(body)
     res = {'summary': summary_list, 'title': title}
-    ne_list = extract_keyword(summary_list, True)
-    res['ne_list'] = ne_list
+    ne_list = extract_keyword([body], True)
+    new_ne_list = []
+    for word in ne_list:
+        for doc in summary_list:
+            doc = doc.replace(r'\s+', '').replace(r' ', '')
+            if regex.search(word.replace(r'\s+', '').replace(r' ', ''), doc):
+                new_ne_list.append(word)
+
+    res['ne_list'] = new_ne_list
 
     # trends
     if( isTrend ):
-        res['trends'] = get_trend(ne_list)
+        res['trends'] = get_trend(new_ne_list)
     else:
         res['trends'] = ''
     
@@ -134,7 +141,7 @@ def extract_keyword(doc_list, isContent):
     ne_list = []
     for i, doc in enumerate(doc_list):
         if isContent:
-            ne_list.append(position.extract(str(doc), topn=10, is_join_words=False))
+            ne_list.append(position.extract(str(doc), topn=20, is_join_words=False))
         else:
             ne_list.append(position.extract(str(doc), topn=4, is_join_words=False))
 

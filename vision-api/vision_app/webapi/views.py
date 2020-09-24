@@ -17,9 +17,10 @@ class Summarization(views.APIView):
         media = request.GET.get('media')
         url = request.GET.get('url')
         mode = request.GET.get('mode')
-
+        print(mode)
+        print(media)
         # crawiling
-        if mode == 'new':
+        if mode == 'news':
             crawler = Crawling()
             article = crawler.get_article(int(media), url)
         elif mode == 'recommend':
@@ -33,13 +34,13 @@ class Recommendation(views.APIView):
         media = request.GET.get('media')
         url = request.GET.get('url')
         mode = request.GET.get('mode')
-
+        print(mode)
         # crawiling
-        if mode == 'new':
+        if mode == 'news':
             crawler = Crawling()
             article = crawler.get_article(int(media), url)
         elif mode == 'recommend':
-            article = Article.objects.filter(url = url)[0]
+            article = Article.objects.filter(url = url)
 
 
         recommend = nlp_utils.get_recommend(url, article['body'])
