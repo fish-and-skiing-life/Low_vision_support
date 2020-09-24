@@ -12,24 +12,38 @@ from .models import Wiki, Trend, Article
 import pandas as pd
 
 
-class ArticleSummarization(views.APIView):
+class Summarization(views.APIView):
     def get(self, request):
-        media_dict = {
-            '0': 'https://news.yahoo.co.jp/articles/',
-            '1': 'https://www.asahi.com/articles/',
-            '2': 'https://www.yomiuri.co.jp/',
-            '3': 'https://www.nikkei.com/article/'
-        }
         media = request.GET.get('media')
         url = request.GET.get('url')
+        mode = request.GET.get('mode')
 
         # crawiling
-        crawler = Crawling()
-        article = crawler.get_article(int(media), url)
+        if mode == 'new':
+            crawler = Crawling()
+            article = crawler.get_article(int(media), url)
+        elif mode == 'recommend':
+            article = Article.objects.filter(url = url)[0]
         print(article)
-        # summarization
 
         return Response(nlp_utils.summarize(article['title'], article['body']))
+
+class Recommendation(views.APIView):
+    def get(self, request):
+        media = request.GET.get('media')
+        url = request.GET.get('url')
+        mode = request.GET.get('mode')
+
+        # crawiling
+        if mode == 'new':
+            crawler = Crawling()
+            article = crawler.get_article(int(media), url)
+        elif mode == 'recommend':
+            article = Article.objects.filter(url = url)[0]
+
+        print(article)
+        return Response(nlp_utils.get_recommend(url, article['body']))
+
 
 class ArticleCategory(views.APIView):
     def get(self, request):
@@ -52,32 +66,6 @@ class ArticleList(views.APIView):
         
         ne_list = nlp_utils.extract_keyword(article_list, False)
         res = {'article_list': article_list, 'ne_list': ne_list, 'trends': nlp_utils.get_trend(ne_list) } 
-        return Response(res)
-
-class RecommendList(views.APIView):
-    def get(self, request):
-        url = request.GET.get('news_url')
-        res = {'recommend':
-                    {
-                        "日本人CA150人、失職の危機　米ユナイテッド、成田勤務": "https://news.yahoo.co.jp/articles/bc6e2bbf2000ee2c636c67f56aee6faa24dac0e3",
-                        '観光政策変わる？自民総裁選、京都の業界も熱視線　「日本人客を大切にするべき」声も': 'https://news.yahoo.co.jp/pickup/6371062',
-                        '「倒産・廃業の予備軍多い」　年末ごろから急増の恐れも': 'https://news.yahoo.co.jp/articles/adec416d5e9fc7b662d7b9abc0336628c44f1f90'
-                    }
-                }
-
-        return Response(res)
-
-class Recommend(views.APIView):
-    def get(self, request):
-        url = request.GET.get('news_url')
-        res = {'recommend':
-                    {
-                        "日本人CA150人、失職の危機　米ユナイテッド、成田勤務": "https://news.yahoo.co.jp/articles/bc6e2bbf2000ee2c636c67f56aee6faa24dac0e3",
-                        '観光政策変わる？自民総裁選、京都の業界も熱視線　「日本人客を大切にするべき」声も': 'https://news.yahoo.co.jp/pickup/6371062',
-                        '「倒産・廃業の予備軍多い」　年末ごろから急増の恐れも': 'https://news.yahoo.co.jp/articles/adec416d5e9fc7b662d7b9abc0336628c44f1f90'
-                    }
-                }
-
         return Response(res)
 
 class Wikipedia(views.APIView):

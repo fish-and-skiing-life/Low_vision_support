@@ -63,7 +63,7 @@ class Crawling:
 
         for li in li_list:
             if site_id == 1 or site_id == 3:
-                if li.string != 'トップ' and li.string != "連載" and li.string != "オピニオン" and li.string != "スポーツ" and li.string != "医療・健康" and li.string != "地域" and li.string != "マーケット":
+                if li.string != 'トップ' and li.string != "連載" and li.string != "オピニオン" and li.string != "スポーツ" and li.string != "医療・健康" and li.string != "地域" and li.string != "マーケット" and li.string != "マネー" and li.string != "文化":
                     if site_id == 3:
                         if li.string != '速報' and li.string != 'ライフ':
                             category.setdefault(li.string, self.base[site_id] + li.get('href')+ 'archive/' )
@@ -73,12 +73,22 @@ class Crawling:
                     else:
                         category.setdefault(li.string, li.get('href').split('?')[0] + "list/", )
 
+            elif site_id == 2:
+                try:
+                    li_text = li.get_text()
+                    if 'トピックス' in li_text or '地域' in li_text or 'まとめ読み' in li_text or '趣味' in li_text: continue
+                    category.setdefault(li_text, self.base[site_id] + li.find('a').get('href') )
+                except:
+                    print('error')
+
             elif site_id == 4:
                 try:
                     if li.get_text() != "トップ":
                         category.setdefault(li.get_text(), self.base[site_id] + li.find('a').get('href') )
                 except:
                     print('error')
+
+            # cite_id == 0
             else:
                 try:
                     category.setdefault(li.get_text(), self.base[site_id] + li.find('a').get('href') )

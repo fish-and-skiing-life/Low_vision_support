@@ -11,7 +11,7 @@ from django.apps import AppConfig
 
 class WebapiConfig(AppConfig):
     name = 'webapi'
-
+    print('load Bert')
     file_path = os.path.join(settings.BASE_DIR, 'webapi/models/bert-base-japanese-whole-word-masking')
 
     bert_tokenizer = BertJapaneseTokenizer.from_pretrained(file_path)
@@ -35,6 +35,8 @@ class WebapiConfig(AppConfig):
     file_path = os.path.join(settings.BASE_DIR, 'webapi/models/jawiki_20180420_100d.pkl')
     
     wiki2vec_model = Wikipedia2Vec.load(file_path)
+
+    print('done')
 
 
     # @staticmethod
@@ -73,4 +75,8 @@ class WebapiConfig(AppConfig):
         
     #     wiki2vec_model = Wikipedia2Vec.load(file_path)
 
+<<<<<<< HEAD
     #     return wiki2vec_model
+=======
+    #     return wiki2vec_model
+>>>>>>> bf65619a2a7dfe15f3d20845d1923e311ba804c5

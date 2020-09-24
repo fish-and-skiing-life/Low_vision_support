@@ -7,7 +7,6 @@ from webapi.apps import WebapiConfig
 from webapi.lib.vectorizer import BertVectorizer
 from webapi.lib import nlp_utils
 
-
 class LexRank:
     def __init__(self, threshold=0.1, max_iter=100, tol=1e-06,):
         self.model = BertVectorizer()

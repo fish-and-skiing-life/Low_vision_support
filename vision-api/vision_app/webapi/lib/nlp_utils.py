@@ -8,6 +8,7 @@ from dateutil.relativedelta import relativedelta
 from webapi.lib.summarizer import LexRank
 import webapi.lib.scoring as scoring
 from webapi.lib.vectorizer import GinzaVectorizer
+from webapi.lib.recommender import ArticleRecommender
 from webapi.lib.keyphrase_extractor import PositionRank
 from ..models import Trend, Article, Named_entity
 import numpy as np
@@ -33,10 +34,22 @@ def calcArticleVector():
     trend_query = []
     article_query = []
     try:
-        for article in data:
+        for index, article in enumerate(data):
+            if index % 30 == 0 and index != 0:
+                Named_entity.objects.bulk_create(named_entity_query)
+                Trend.objects.bulk_create(trend_query)
+                Article.objects.bulk_update(article_query, fields=['vector'])
+                named_entity_query = []
+                trend_query = []
+                article_query = []
+                print('aaaaaaaaa')
+            if index % 100 == 0:
+                print(index)
+
             key_dict = {}
             trend_dict = {}
             key_list = position.extract(article.content)
+
             for keyword in key_list:
                 vector = vectorizer.encode_phrase(keyword)
                 vector_str = str(vector.tolist())
@@ -59,7 +72,7 @@ def calcArticleVector():
 
             article.vector = article_vector_str
             article_query.append(article)
-            break
+            
         Named_entity.objects.bulk_create(named_entity_query)
         Trend.objects.bulk_create(trend_query)
         Article.objects.bulk_update(article_query, fields=['vector'])
@@ -198,3 +211,60 @@ def split_sentences(text):
         文のリスト
     """
     return [s.strip() for s in regex.findall(r'[\S\s]+?。', text)]
+
+def get_recommend(url, article):
+    """記事をレコメンドする
+
+    Parameters
+    ----------
+    url : str
+        記事のURL
+    article: str
+        記事本文
+    
+    Returns
+    -------
+    dict[str, str]
+        各要素は辞書型で `{title: url}`
+    """
+    try:
+        article_info = Article.objects.get(url=url)
+        vector_str = article_info.vector
+        vector_str.replace('[', '').replace(']', '').replace(' ', '').split(',')
+        article_vector = np.array([float(vs) for vs in vector_str])
+
+    except:
+        trend_data = Trend.objects.all()
+        trend_word = {}
+        for row in trend_data:
+            trend_word.setdefault(row.word, row.score)
+        position = PositionRank()
+        vectorizer = GinzaVectorizer()
+
+        key_list = position.extract(article)
+        trend_dict = {}
+        key_dict = {}
+
+        for keyword in key_list:
+            if keyword not in trend_word:
+                keyword_score = get_trend_score(keyword)
+                trend = Trend(word = keyword, score = keyword_score)
+                time.sleep(10)
+                trend_word.setdefault(keyword, keyword_score)
+            else:
+                keyword_score = trend_word[keyword]
+            trend_dict.setdefault(keyword, keyword_score)
+
+            vector = vectorizer.encode_phrase(keyword)
+            key_dict.setdefault(keyword, vector)
+
+        article_vector = vectorizer.calc_weighted_article_vector(key_dict, trend_dict, theta=0.8)
+
+    recommender = ArticleRecommender()
+    recommend_list = recommender.get_similar_articles(url, article_vector)
+
+    recommend = {}
+    for recommend_article in recommend_list:
+        recommend.update(recommend_article)
+    
+    return recommend

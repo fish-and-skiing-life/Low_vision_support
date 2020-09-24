@@ -235,23 +235,23 @@
 }
 
 .news_title{
-  font-size: 3em !important;
+  font-size: 2.3em !important;
   line-height: 1.5em !important;
 }
 
 .large_word{
-  font-size: 2em !important;
+  font-size: 1.6em !important;
   font-weight: bold;
   line-height: 1.4em !important;
 }
 
 .midle_word{
-  font-size: 1.6em !important;
+  font-size: 1.4em !important;
   line-height: 1.2em !important;
 }
 
 .small_word{
-  font-size: 1.3em !important;
+  font-size: 1.2em !important;
 }
 
 .regnitional-btn{
