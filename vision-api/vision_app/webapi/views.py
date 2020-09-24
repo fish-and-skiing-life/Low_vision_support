@@ -8,7 +8,7 @@ from webapi.lib.crawling import Crawling
 from django.conf import settings
 from webapi.apps import WebapiConfig
 import webapi.lib.nlp_utils as nlp_utils
-from .models import Wiki, Trend, Article
+from .models import Wiki, Trend, Article, Named_entity
 import pandas as pd
 
 
@@ -23,7 +23,7 @@ class Summarization(views.APIView):
             crawler = Crawling()
             article = crawler.get_article(int(media), url)
         elif mode == 'recommend':
-            article = Article.objects.filter(url = url)[0]
+            article = Article.objects.filter(url = url)
         print(article)
 
         return Response(nlp_utils.summarize(article['title'], article['body']))
@@ -41,8 +41,17 @@ class Recommendation(views.APIView):
         elif mode == 'recommend':
             article = Article.objects.filter(url = url)[0]
 
-        print(article)
-        return Response(nlp_utils.get_recommend(url, article['body']))
+
+        recommend = nlp_utils.get_recommend(url, article['body'])
+        result = Named_entity.objects.filter(url = url)
+        ne_list = []
+        trend_list = {}
+        for row in result:
+            ne_list.append(row.word)
+            trend_list.setdefault(word, Trend.objects.filter(word = row.word).score)
+
+        res = {'recommend_list': recommend, 'ne_list': ne_list, 'trends': trend_list } 
+        return Response(res)
 
 
 class ArticleCategory(views.APIView):

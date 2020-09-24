@@ -82,7 +82,7 @@
 
             for( var ne_index in response.data.ne_list){
               this.neList.push(response.data.ne_list[ne_index].replace(/\s+/g, ''))
-            }
+            }i
             this.regular_expresion = new RegExp('(' + this.ne_list.join('|') + ')', 'i');
           }else{
             this.manuscript.push('ニュース記事のクローリングに失敗しました。')
@@ -150,11 +150,11 @@
         if(index !== -1){
           var text = this.news.ne_list[index]
 
-          if(this.news.trends[text]  > 500){
+          if(this.news.trends[text]  > 0.3){
             return ['large_word']
-          }else if(this.news.trends[text]  > 300){
+          }else if(this.news.trends[text]  > 0.1){
             return ['midle_word']
-          }else if(this.news.trends[text]  > 100){
+          }else if(this.news.trends[text]  > 0.07){
             return ['small_word']
           }
           
