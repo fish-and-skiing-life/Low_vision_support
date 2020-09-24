@@ -106,6 +106,16 @@ class CalcDb(views.APIView):
         print('end calcDB')
         return Response({'result': result})
 
+
+class CalcTrend(views.APIView):
+    def get(self, request):
+        print('start trend')
+        result = Trend.objects.filter(score = 0)
+        for row in result:
+            score = nlp_utils.get_trend_score(row.word)
+        print('end trend')
+        return Response({'result': 'ok'})
+
 class InsertWiki(views.APIView):
     def get(self, request):
         df = pd.read_csv('/myapp/vision_app/webapi/wiki_data.csv')

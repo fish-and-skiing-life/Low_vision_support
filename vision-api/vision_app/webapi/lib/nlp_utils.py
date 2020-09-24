@@ -223,12 +223,9 @@ def get_trend_score(word):
     # pytrend = TrendReq(hl='jp-JP', tz=-540)
 
     pytrend.build_payload([word], cat=0, timeframe=f'{start_frame} {end_frame}', geo='JP')
-    try:
-        data = pytrend.interest_over_time().drop(['isPartial'], axis=1)
-        data = list(itertools.chain.from_iterable(data.values.tolist()))
-        score = scoring.calc_trend_score(data)
-    except:
-        score = 0
+    data = pytrend.interest_over_time().drop(['isPartial'], axis=1)
+    data = list(itertools.chain.from_iterable(data.values.tolist()))
+    score = scoring.calc_trend_score(data)
     
 
     return score

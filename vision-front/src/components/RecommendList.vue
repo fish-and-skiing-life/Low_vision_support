@@ -26,7 +26,7 @@
             v-for="news in content"
             :key="news"
           >
-            <v-list-item-title class='news_title mb-4'>{{i + 1}}.  
+            <v-list-item-title class='news_title mb-4'>  
               <span v-for='word in news' :key="word" :class='calcHot(word)'>
                 {{ word}}
               </span>
@@ -98,8 +98,8 @@
           console.log(error)
       })
 
-      for(var row in this.data.recommend_list){
-        this.content.push( this.newsList[row].replace(/\s+/g, '').split(this.regular_expresion) )
+      for(var row in this.recommend){
+        this.content.push( this.recommend[row].replace(/\s+/g, '').split(this.regular_expresion) )
       }
       console.log(this.content)
       const speechRecognition = new window.webkitSpeechRecognition()
@@ -195,28 +195,40 @@
 
 .speak{
   font-size: 2em !important;
-  line-height: 1.7em !important;
+  line-height: 1.5em !important;
   margin-bottom: 0.8em !important;
 
 }
 
-.large_word{
+.news_title{
   font-size: 2.3em !important;
+  line-height: 1.5em !important;
+}
+
+.large_word{
+  font-size: 1.6em !important;
   font-weight: bold;
   line-height: 1.4em !important;
 }
 
 .midle_word{
-  font-size: 1.6em !important;
+  font-size: 1.4em !important;
   line-height: 1.2em !important;
 }
 
 .small_word{
-  font-size: 1.3em !important;
+  font-size: 1.2em !important;
+}
+
+.regnitional-btn{
+  height: 100px !important;
+  min-width: 94px !important;
+  font-size: 3em !important;
+  padding: 0.5em !important;
 }
 
 .v-btn__content{
-  font-size: 2em !important;
+  margin: 20px;
 }
 
 @media screen and (min-width:480px) and (max-width:768px) {
