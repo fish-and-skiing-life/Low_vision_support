@@ -4,6 +4,7 @@ import pke
 import os
 
 from django.conf import settings
+from webapi.apps import WebapiConfig
 
 
 class PositionRank:
@@ -13,8 +14,7 @@ class PositionRank:
     def __init__(self):
         # ストップワード登録
         pke.base.ISO_to_language['ja_ginza'] = 'japanese'
-        stop_words = self._load_stopwords()
-        nltk.corpus.stopwords.words = lambda lang : stop_words
+        nltk.corpus.stopwords.words = lambda lang : WebapiConfig.stop_words
 
     def extract(self, text, topn=10, is_join_words=True):
         """テキストからキーフレーズをtopn個抽出する．
@@ -40,14 +40,6 @@ class PositionRank:
         keyphrases = extractor.get_n_best(n=topn)
 
         return self._postprocessing(keyphrases, is_join_words)
-
-    def _load_stopwords(self):
-        file_path = os.path.join(
-            settings.BASE_DIR, 'webapi/res/stopwords.txt'
-            )
-        with open(file_path) as f:
-            stopwords = f.read().split()
-        return stopwords
 
     def _postprocessing(self, keyphrases, is_join_words=True):
         _keyphrases = keyphrases.copy()
