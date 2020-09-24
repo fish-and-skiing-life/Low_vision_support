@@ -20,6 +20,19 @@
         <h1 class="title mt-10">関連ニュース</h1>
 
         <!-- <p> {{ news }}</p> -->
+        <v-list class='mx-auto text-center' >
+          <v-list-item
+            class='text-center'
+            v-for="news in content"
+            :key="i"
+          >
+            <v-list-item-title class='news_title mb-4'>{{i + 1}}.  
+              <span v-for='word in news' :key="word" :class='calcHot(word)'>
+                {{ word}}
+              </span>
+            </v-list-item-title>
+          </v-list-item>
+        </v-list> 
         <p class="speak mt-10" v-for='row in recommend' :key="row">{{ row }}</p>
 
         <v-btn x-large color="primary" @click="startSpeech">{{ recognitionText }}</v-btn><br>
@@ -54,9 +67,12 @@
         fee: localStorage.getItem("newsFee"),
         mode: localStorage.getItem("mode"),
         manuscript: [],
+        neList: [],
         data: {},
         show: false,
-        recommend: []
+        regular_expresion: '',
+        recommend: [],
+        content: []
       }
     },
     async mounted(){
@@ -66,17 +82,26 @@
           console.log(response.data)
           this.data = response.data
           this.manuscript.push('オススメの関連ニュースは、')
-          var keys = Object.keys(response.data.recommend)
+          var keys = Object.keys(response.data.recommend_list)
           for (const [index, key] of keys.entries()) {
             this.manuscript.push(String(index + 1) + "番、" + key)
             this.recommend.push(String(index + 1) + "番、" + key)
           }
+
+          for( var index in response.data.ne_list){
+            this.neList.push(response.data.ne_list[index].replace(/\s+/g, ''))
+          }
+          this.regular_expresion = new RegExp('(' + this.neList.join('|') + ')', 'i');
           this.manuscript.push("です。")
         }).catch(error => {
           this.manuscript.push('エラーが起きました。ページをリロードして、やり直してください。')
           console.log(error)
       })
 
+      for(var row in this.data.recommend_list){
+        this.content.push( this.newsList[row].replace(/\s+/g, '').split(this.regular_expresion) )
+      }
+      console.log(this.content)
       const speechRecognition = new window.webkitSpeechRecognition()
       speechRecognition.lang = "ja-JP";
       speechRecognition.continuous = true;
@@ -99,6 +124,24 @@
       this.isLoading = false
     },
     methods:{
+      calcHot(word){
+        var index = this.neList.indexOf(word)
+
+        if( index !== -1){
+          var text = this.data.ne_list[index]
+          console.log(text)
+          console.log(this.data.trends[text])
+          if(this.data.trends[text] > 0.3){
+            return ['large_word']
+          }else if(this.data.trends[text] > 0.2){
+            return ['midle_word']
+          }else if(this.data.trends[text] > 0.1){
+            return ['small_word']
+          }
+          
+        }
+        return []
+      },
       sleep(waitMsec) {
         window.setTimeout(() => {},waitMsec)
       },
