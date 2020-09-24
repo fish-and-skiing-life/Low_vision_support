@@ -4,8 +4,8 @@ import scipy.spatial
 import spacy
 
 from webapi.apps import WebapiConfig
-from vectorizer import BertVectorizer
-import webapi.lib.nlp_utils as nlp_utils
+from webapi.lib.vectorizer import BertVectorizer
+from webapi.lib import nlp_utils
 
 
 class LexRank:

@@ -17,4 +17,5 @@ pandas
 pytrends
 wikipedia2vec
 gensim
-"transformers[ja]"
+torch
+transformers[ja]
