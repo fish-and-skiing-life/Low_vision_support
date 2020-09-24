@@ -24,7 +24,7 @@
           <v-list-item
             class='text-center'
             v-for="news in content"
-            :key="i"
+            :key="news"
           >
             <v-list-item-title class='news_title mb-4'>{{i + 1}}.  
               <span v-for='word in news' :key="word" :class='calcHot(word)'>
