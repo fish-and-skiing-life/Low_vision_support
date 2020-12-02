@@ -33,7 +33,7 @@
             </v-list-item-title>
           </v-list-item>
         </v-list> 
-        <p class="speak mt-10" v-for='row in recommend' :key="row">{{ row }}</p>
+        <!-- <p class="speak mt-10" v-for='row in recommend' :key="row">{{ row }}</p> -->
 
         <v-btn x-large color="primary" @click="startSpeech">{{ recognitionText }}</v-btn><br>
         <button @click="startTalk" class='read'>音声読み上げ</button>
@@ -79,7 +79,6 @@
       await axios
         .get(process.env.VUE_APP_API + "/api/recommend", {params: {"media": this.site_dict[this.site], "url": this.titleUrl, 'mode': this.mode} })
         .then(response => {
-          console.log(response.data)
           this.data = response.data
           this.manuscript.push('オススメの関連ニュースは、')
           var keys = Object.keys(response.data.recommend_list)
@@ -93,15 +92,14 @@
           }
           this.regular_expresion = new RegExp('(' + this.neList.join('|') + ')', 'i');
           this.manuscript.push("です。")
-        }).catch(error => {
+        }).catch(() => {
           this.manuscript.push('エラーが起きました。ページをリロードして、やり直してください。')
-          console.log(error)
       })
 
+      this.content = []
       for(var row in this.recommend){
         this.content.push( this.recommend[row].replace(/\s+/g, '').split(this.regular_expresion) )
       }
-      console.log(this.content)
       const speechRecognition = new window.webkitSpeechRecognition()
       speechRecognition.lang = "ja-JP";
       speechRecognition.continuous = true;
@@ -129,8 +127,6 @@
 
         if( index !== -1){
           var text = this.data.ne_list[index]
-          console.log(text)
-          console.log(this.data.trends[text])
           if(this.data.trends[text] > 0.3){
             return ['large_word']
           }else if(this.data.trends[text] > 0.2){
@@ -168,7 +164,6 @@
         const val_list = val.split('番')
         if(val_list.length == 2){
           var num = this.Kan2Num(val_list[0])
-          console.log(num)
           localStorage.newsTitle = this.newsList[num - 1]
           localStorage.newsUrl = this.data[this.newsList[num -1]]['url']
           localStorage.newsFee = this.data[this.newsList[num -1]]['fee']
