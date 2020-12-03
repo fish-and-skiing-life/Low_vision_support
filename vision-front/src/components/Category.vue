@@ -45,8 +45,7 @@
             this.manuscript.push(key.replace(/\r?\n/g,""))
           }
           this.manuscript.push("があります。")
-        }).catch(error => {
-          console.log('this is errior',error)
+        }).catch(() => {
       })
       const speechRecognition = new window.webkitSpeechRecognition()
       speechRecognition.lang = "ja-JP";
@@ -87,29 +86,23 @@
     },
     watch:{
       text(val){
-        console.log(val)
         if(val.match(/腫瘍/)){
           val = "主要"
         }
         else if(val.match(/it/ )){
           val = "IT"
-          console.log(val)
         }
         else if(val.match(/社会/ && val.match(/暮らし/))){
           val = "社会・くらし"
-          console.log(val)
         }
         else if(val.match(/社会/ && val.match(/暮らし/))){
           val = "社会・くらし"
-          console.log(val)
         }
         else if(val.match(/エンタメ/ && val.match(/文化/))){
           val = "エンタメ・文化"
-          console.log(val)
         }
         else if(val.match(/囲碁/ && val.match(/将棋/))){
           val = "囲碁・将棋"
-          console.log(val)
         }
         if(this.category_dict[val]){
           this.speech.cancel()

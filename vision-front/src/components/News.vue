@@ -70,8 +70,8 @@
       await axios
         .get(process.env.VUE_APP_API + "/api/summarize", {params: { "media": this.site_dict[this.site], "url": this.titleUrl,'mode': this.mode} })
         .then(response => {
-          console.log(response.data)
           if(response.data.summary.length > 0){
+            console.log(response.data)
             this.manuscript.push("タイトル、" + this.title)
             this.news = response.data
             this.manuscript.push("要約文章")
@@ -92,27 +92,33 @@
             this.manuscript.push('違う記事を選択する場合は、記事の変更と発声してください')
           }
           
-        }).catch(error => {
+        }).catch(() => {
           this.manuscript.push('エラーが起きました。ページをリロードして、やり直してください。')
           this.manuscript.push('リロードしてもエラーが起きる場合、他のニュース媒体を選択するか、違うカテゴリーを選択するか、違う記事を選択してください。')
           this.manuscript.push('他のニュース媒体を選択する場合は、ニュース媒体を選択すると発声してください')
           this.manuscript.push('違うカテゴリーを選択する場合は、カテゴリーの変更と発声してください')
           this.manuscript.push('違う記事を選択する場合は、記事の変更と発声してください')
-          console.log(error)
       })
-      console.log(this.regular_expresion)
       for(var row in this.news.summary){
         this.content.push( this.news.summary[row].replace(/\s+/g, '').split(this.regular_expresion) )
       }
 
       await this.getVoice().then(response => {
-        this.voice = response[57]
+        for (var index in response){
+          if(response[index].lang == "ja-JP"){
+            this.voice = response[index]
+          }
+          // console.log(response[index].lang)
+        }
+        
       })
 
       const speechRecognition = new window.webkitSpeechRecognition()
       speechRecognition.lang = "ja-JP";
       speechRecognition.continuous = true;
       this.recognition = speechRecognition;
+      console.log(this.recognition)
+      console.log(this.manuscript)
       this.recognition.onstart = () => {
         this.recognitionText = "音声入力中...";
       };
@@ -146,9 +152,7 @@
         window.setTimeout(() => {},waitMsec)
       },
       calcHot(word){
-        console.log(word)
         var index = this.neList.indexOf(word)
-        console.log(index)
         if(index !== -1){
           var text = this.news.ne_list[index]
 
@@ -164,6 +168,7 @@
         return []
       },
       async startSpeech() {
+        console.log('sdfsdfsdfsdfsdf',this.recognition)
         await this.recognition.start()
       },
       startTalk() {

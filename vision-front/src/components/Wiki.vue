@@ -104,12 +104,10 @@
           this.speech.cancel()
           this.$router.push('./wiki')
         }else{
-          console.log(val)
           this.isLoading = true
           axios
             .get(process.env.VUE_APP_API + "/api/wiki", {params: { "word": val} })
             .then(response => {
-              console.log(response.data)
               this.word = val
               this.data = response.data
               if(response.data.title == 'error'){
@@ -121,8 +119,7 @@
               }
               
               this.isLoading = false
-            }).catch(error => {
-              console.log(error)
+            }).catch(() => {
           })
         }
       }

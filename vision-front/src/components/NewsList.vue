@@ -71,7 +71,6 @@
       await axios
         .get(process.env.VUE_APP_API + "/api/article_list", {params: { "media": this.site_dict[this.site], "category_url": this.category_url} })
         .then(response => {
-          console.log(response.data)
           this.newsList = Object.keys(response.data.article_list)
           if( this.newsList.length > 0 ){
             this.manuscript.push('記事の選択は1番のように、記事の番号で選択してください。')
@@ -96,12 +95,11 @@
             this.manuscript.push('違うカテゴリーを選択する場合は、カテゴリーの変更と発声してください')
           }
           
-        }).catch(error => {
+        }).catch(() => {
           this.manuscript.push('エラーが起きました。ページをリロードして、やり直してください。')
           this.manuscript.push('リロードしてもエラーが起きる場合、他のニュース媒体を選択するか、違うカテゴリーを選択してください。')
           this.manuscript.push('他のニュース媒体を選択するする場合は、ニュース媒体を選択すると発声してください')
           this.manuscript.push('違うカテゴリーを選択する場合は、カテゴリーの変更と発声してください')
-          console.error(error)
       })
 
       for(var row in this.newsList){
@@ -136,8 +134,6 @@
 
         if( index !== -1){
           var text = this.data.ne_list[index]
-          console.log(text)
-          console.log(this.data.trends[text])
           if(this.data.trends[text] > 0.3){
             return ['large_word']
           }else if(this.data.trends[text] > 0.2){
