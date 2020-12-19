@@ -55,6 +55,7 @@
     },
     data(){
       return {
+        speech: window.speechSynthesis,
         isLoading: true,
         fullPage: true,
         recognition : "",
