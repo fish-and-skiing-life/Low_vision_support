@@ -123,6 +123,8 @@
                 this.startTalk()
               }else{
                 this.summary = response.data.summary
+                this.manuscript = this.summary
+                this.startTalk()
               }
               
               this.isLoading = false
