@@ -92,6 +92,8 @@
           }
           this.regular_expresion = new RegExp('(' + this.neList.join('|') + ')', 'i');
           this.manuscript.push("です。")
+
+          this.manuscript.push("戻ると発話するとニュース記事に戻ります")
         }).catch(() => {
           this.manuscript.push('エラーが起きました。ページをリロードして、やり直してください。')
       })
@@ -169,7 +171,13 @@
           localStorage.newsFee = this.data[this.newsList[num -1]]['fee']
           localStorage.mode = 'recommend'
           this.$router.push('./news')
-        }else{
+        }
+        else if (val.match(/戻る/)){
+          this.speech.cancel()
+          // ニュース記事に戻る
+          this.$router.push('./news')
+        }
+        else{
           let u = new SpeechSynthesisUtterance();
           u.lang = 'ja-JP';
           u.rate = 1.3

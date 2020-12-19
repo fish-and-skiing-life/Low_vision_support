@@ -84,6 +84,9 @@
               }
             }
             this.manuscript.push("です。")
+
+            this.manuscript.push("戻ると発話するとカテゴリー選択ページに戻ります")
+
             for( var index in response.data.ne_list){
               this.neList.push(response.data.ne_list[index].replace(/\s+/g, ''))
             }
@@ -201,6 +204,11 @@
         else if(val.match(/ニュース媒体/)){
           this.speech.cancel()
           this.$router.push('./')
+        }
+        else if (val.match(/戻る/)){
+          this.speech.cancel()
+          // カテゴリー選択ページに戻る
+          this.$router.push('./category')
         }
         else{
           this.speech.cancel()

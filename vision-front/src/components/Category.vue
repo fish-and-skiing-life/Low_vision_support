@@ -45,6 +45,8 @@
             this.manuscript.push(key.replace(/\r?\n/g,""))
           }
           this.manuscript.push("があります。")
+
+          this.manuscript.push("戻ると発話するとホームに戻ります")
         }).catch(() => {
       })
       const speechRecognition = new window.webkitSpeechRecognition()
@@ -104,12 +106,19 @@
         else if(val.match(/囲碁/ && val.match(/将棋/))){
           val = "囲碁・将棋"
         }
+
         if(this.category_dict[val]){
           this.speech.cancel()
           localStorage.category = val
           localStorage.category_url = this.category_dict[val]
           this.$router.push('./news-list')
-        }else{
+        }
+        else if (val.match(/戻る/)){
+          this.speech.cancel()
+          // Homeに戻る
+          this.$router.push('/')
+        }
+        else{
           this.speech.cancel()
           let u = new SpeechSynthesisUtterance();
           u.lang = 'ja-JP';

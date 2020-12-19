@@ -14,43 +14,43 @@ services:
     tty: true
     command: npm run serve 
     environment:
-      VUE_APP_API: http://localhost:8000
+      VUE_APP_API: http://18.188.226.222:8000
 
 
-  vision-api:
-    # build: ./vision-api
-    image: inatetsu/vision-api
-    ports:
-      - 8000:8000
-    volumes:
-      - ./vision-api:/myapp
-    command: python ./vision_app/manage.py runserver 0.0.0.0:8000
-    # command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000 --noreload"
-    container_name: vision-api
-    tty: true
-    stdin_open: true
-    privileged: true
-    depends_on:
-      - news-db
-    environment:
-      - DB_news_NAME=news
-      - DB_wiki_NAME=wiki
-      - DB_USER=root
-      - DB_PASS=password
-      - DB_wiki_HOST=wiki-db
-      - DB_news_HOST=news-db
+  # vision-api:
+  #   # build: ./vision-api
+  #   image: inatetsu/vision-api
+  #   ports:
+  #     - 8000:8000
+  #   volumes:
+  #     - ./vision-api:/myapp
+  #   command: python ./vision_app/manage.py runserver 0.0.0.0:8000
+  #   # command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000 --noreload"
+  #   container_name: vision-api
+  #   tty: true
+  #   stdin_open: true
+  #   privileged: true
+  #   depends_on:
+  #     - news-db
+  #   environment:
+  #     - DB_news_NAME=news
+  #     - DB_wiki_NAME=wiki
+  #     - DB_USER=root
+  #     - DB_PASS=password
+  #     - DB_wiki_HOST=wiki-db
+  #     - DB_news_HOST=news-db
 
-  news-db:
-    # build: ./news_db
-    image: inatetsu/news-db
-    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
-    volumes:
-      - ./news_db/data:/var/lib/mysql
-      - ./news_db/data:/var/lib/mysql-files
-      - ./news_db/conf:/etc/mysql/conf.d
-      - ./news_db/init:/docker-entrypoint-initdb.d/
-    ports:
-      - 3307:3306
+  # news-db:
+  #   # build: ./news_db
+  #   image: inatetsu/news-db
+  #   command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
+  #   volumes:
+  #     - ./news_db/data:/var/lib/mysql
+  #     - ./news_db/data:/var/lib/mysql-files
+  #     - ./news_db/conf:/etc/mysql/conf.d
+  #     - ./news_db/init:/docker-entrypoint-initdb.d/
+  #   ports:
+  #     - 3307:3306
 
   #nginx:
   #  image: nginx:1.13
