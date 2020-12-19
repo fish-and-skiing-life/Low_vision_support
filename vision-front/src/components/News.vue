@@ -79,6 +79,8 @@
               this.manuscript.push(response.data.summary[index])
             }
             this.manuscript.push("何か気になった単語はありましたか？。オススメの関連ニュースを読みますか？。回答は、単語を調べる、関連ニュースを読むのどちらかでお願いします。")
+            
+            this.manuscript.push("戻ると発話するとニュース一覧ページに戻ります")
 
             for( var ne_index in response.data.ne_list){
               this.neList.push(response.data.ne_list[ne_index].replace(/\s+/g, ''))
@@ -204,6 +206,11 @@
         }
         else if(val.match(/記事の変更/)){
           this.speech.cancel()
+          this.$router.push('./news-list')
+        }
+        else if (val.match(/戻る/)){
+          this.speech.cancel()
+          // ニュース記事一覧に戻る
           this.$router.push('./news-list')
         }
         else{

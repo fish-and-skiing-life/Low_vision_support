@@ -54,6 +54,7 @@
     },
     async mounted(){
       this.manuscript.push('気になった単語を教えてください。')
+      this.manuscript.push("戻ると発話するとニュース記事に戻ります")
 
       const speechRecognition = new window.webkitSpeechRecognition()
       speechRecognition.lang = "ja-JP";
@@ -103,7 +104,13 @@
         else if(this.text.match(/単語/)){
           this.speech.cancel()
           this.$router.push('./wiki')
-        }else{
+        }
+        else if (val.match(/戻る/)){
+          this.speech.cancel()
+          // ニュース記事に戻る
+          this.$router.push('./news')
+        }
+        else{
           this.isLoading = true
           axios
             .get(process.env.VUE_APP_API + "/api/wiki", {params: { "word": val} })
@@ -116,6 +123,8 @@
                 this.startTalk()
               }else{
                 this.summary = response.data.summary
+                this.manuscript = this.summary
+                this.startTalk()
               }
               
               this.isLoading = false
