@@ -114,7 +114,7 @@ def summarize(title, body, isTrend = True ):
                 new_ne_list.append(word)
 
     res['ne_list'] = new_ne_list
-
+    res['all'] = body
     # trends
     if( isTrend ):
         res['trends'] = get_trend(new_ne_list)
