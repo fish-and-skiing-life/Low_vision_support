@@ -14,7 +14,7 @@ services:
     tty: true
     command: npm run serve 
     environment:
-      VUE_APP_API: http://18.188.226.222:8000
+      VUE_APP_API: http://3.134.88.67:8000
 
 
   # vision-api:
